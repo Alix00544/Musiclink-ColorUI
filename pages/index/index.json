@@ -1,0 +1,7 @@
+{
+  "usingComponents": {
+    "dynamic":"/pages/tabbar/dynamic/dynamic",
+    "sing":"/pages/tabbar/sing/sing",
+    "mine":"/pages/tabbar/mine/mine"
+  }
+}
