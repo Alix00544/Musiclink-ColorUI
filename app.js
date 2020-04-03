@@ -8,6 +8,7 @@ App({
     wx.getSystemInfo({
       success: e => {
         this.globalData.StatusBar = e.statusBarHeight;
+        this.globalData.WinHeight = e.windowHeight;
         //胶囊按钮的布局位置信息
         let capsule = wx.getMenuButtonBoundingClientRect();
         if (capsule) {

@@ -4,7 +4,9 @@
     "pages/tabbar/dynamic/dynamic",
     "pages/tabbar/sing/sing",
     "pages/tabbar/mine/mine",
-    "pages/detail/search/search"
+    "pages/detail/search/search",
+    "pages/detail/rankList/rankList",
+    "pages/detail/sendDynamic/sendDynamic"
   ],
   "window": {
     "navigationStyle": "custom"

@@ -53,6 +53,13 @@
 					"id": -1,
 					"name": "pages/detail/search/search",
 					"pathName": "pages/detail/search/search",
+					"query": "",
+					"scene": null
+				},
+				{
+					"id": -1,
+					"name": "pages/detail/rankList/rankList",
+					"pathName": "pages/detail/rankList/rankList",
 					"scene": null
 				}
 			]
