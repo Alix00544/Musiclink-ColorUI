@@ -1,1 +1,3 @@
-/* pages/detail/search/search.wxss */
+page{
+  background-color: white;
+}

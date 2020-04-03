@@ -1,6 +1,7 @@
 Page({
   data: {
-    searchValue: ""
+    searchValue: "",
+    hotSearch:["温柔","告白气球","周杰伦","五月天","年少有为"]
   },
   onLoad: function (options) {
     var searchHistory = wx.getStorageSync('searchHistory');
@@ -58,7 +59,7 @@ Page({
       searchHistory:[]
     })
   },
-  bindSearchFromHistory:function(e){
+  bindSearchFromTag:function(e){
     this.setData({
       searchValue:e.currentTarget.dataset.searchValue
     })
