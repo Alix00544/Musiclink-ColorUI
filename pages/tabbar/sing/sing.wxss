@@ -1,1 +1,19 @@
 /* pages/tabbar/sing/sing.wxss */
+.my-swiper {
+  height: 125px;
+  min-height: 250rpx;
+}
+
+.nav .cu-item.cur {
+  border-bottom: 6rpx solid;
+}
+
+.my-search-fixed {
+  position: fixed;
+  width: 100%;
+  z-index: 10;
+}
+
+.my-border-bottom{
+  border-bottom: 1px solid #f1f1f1;
+}

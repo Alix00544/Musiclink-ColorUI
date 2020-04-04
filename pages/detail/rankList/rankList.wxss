@@ -1,3 +1,7 @@
 .nav .cu-item.cur {
   border-bottom: 8rpx solid;
 }
+
+.my-border-bottom{
+  border-bottom: 1px solid #f1f1f1;
+}
