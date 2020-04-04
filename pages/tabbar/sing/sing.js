@@ -35,7 +35,7 @@ Page({
     TabCur: 0,
     scrollLeft: 0,
     CustomBar: app.globalData.CustomBar,
-    WinHeight:app.globalData.WinHeight,
+    WinHeight: app.globalData.WinHeight,
     ranklist: [{
       rankname: "热门榜",
       songlist: [{
@@ -50,7 +50,7 @@ Page({
         name: "温柔3",
         singer: "五月天",
         coverImg: "https://p1.music.126.net/s47PMA_wT4IF5HFKfDxhzg==/109951164836564113.jpg"
-      },{
+      }, {
         name: "温柔4",
         singer: "五月天",
         coverImg: "https://p1.music.126.net/s47PMA_wT4IF5HFKfDxhzg==/109951164836564113.jpg"
@@ -62,7 +62,7 @@ Page({
         name: "温柔6",
         singer: "五月天",
         coverImg: "https://p1.music.126.net/s47PMA_wT4IF5HFKfDxhzg==/109951164836564113.jpg"
-      },{
+      }, {
         name: "温柔7",
         singer: "五月天",
         coverImg: "https://p1.music.126.net/s47PMA_wT4IF5HFKfDxhzg==/109951164836564113.jpg"
@@ -131,30 +131,23 @@ Page({
     console.log(e.currentTarget.dataset.song);
     // TODO:跳转至唱歌界面
   },
-  bindscroll:function(e){
+  bindscroll: function (e) {
     // 巧妙实现吸顶效果,棒棒哒
-    console.log(e.detail.scrollTop);
     // 当scroll-view向上滑时才可能会形成吸顶
-    if(e.detail.deltaY < 0 && e.detail.scrollTop < 50){
+    if (e.detail.deltaY < 0 && e.detail.scrollTop < 50) {
       wx.pageScrollTo({
         scrollTop: this.data.WinHeight,
-        duration: 40,
-        success:function(res){
-          console.log(res)
-        }
+        duration: 40
       })
     }
-    if(e.detail.deltaY >0 && e.detail.scrollTop < 30){
+    if (e.detail.deltaY > 0 && e.detail.scrollTop < 30) {
       wx.pageScrollTo({
         scrollTop: 0,
-        duration: 40,
-        success:function(res){
-          console.log(res)
-        }
+        duration: 40
       })
     }
   },
-  /** 图标栏 */ 
+  /** 图标栏 */
   bindIconNav: function (e) {
     var pageName = e.currentTarget.dataset.curIcon;
     wx.navigateTo({

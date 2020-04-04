@@ -1,1 +1,47 @@
-/* pages/tabbar/dynamic/dynamic.wxss */
+/* 自定义导航栏 */
+.cus-nav {
+  position: fixed;
+  top: 0;
+  z-index: 100;
+}
+
+.swiper-tab {
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  width: 40%;
+}
+
+.tab-item {
+  text-align: center;
+  font-size: 16px;
+  color: #f6f6f6;
+}
+
+.on {
+  color: #fff;
+  font-size: 23px;
+  font-weight: 700;
+}
+
+.nav-search {
+  width: 30%;
+  display: flex;
+}
+
+.my-img-lg{
+  height: 22px;
+  width: 22px;
+  margin: auto;
+}
+
+
+/* 音频 */
+/* 带有合唱栏的 */
+.with-chorus{
+  width: calc(100% - 150rpx - 20rpx - 120rpx)!important;
+}
+/* 不带合唱栏的 */
+.without-chorus{
+  width: calc(100% - 150rpx - 20rpx - 20rpx)!important;
+}

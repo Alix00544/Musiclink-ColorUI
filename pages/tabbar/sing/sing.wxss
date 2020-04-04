@@ -1,4 +1,7 @@
 /* pages/tabbar/sing/sing.wxss */
+page{
+  background-color: white;
+}
 .my-swiper {
   height: 125px;
   min-height: 250rpx;
@@ -16,4 +19,9 @@
 
 .my-border-bottom{
   border-bottom: 1px solid #f1f1f1;
+}
+
+.my-box{
+  height: 150rpx;
+  width: 150rpx;
 }

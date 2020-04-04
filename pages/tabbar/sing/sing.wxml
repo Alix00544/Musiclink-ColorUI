@@ -1,4 +1,4 @@
-<cu-custom bgColor="bg-gradual-orange" isBack="{{false}}">
+<cu-custom bgColor="bg-gradual-red" isBack="{{false}}">
 	<view slot="content">MusicLink</view>
 </cu-custom>
 <!-- 搜索栏 -->
@@ -16,16 +16,16 @@
 <!-- 填补fixed搜索栏后丢失的空间 -->
 <view style="padding-top:100rpx"></view>
 <!-- 轮播图 -->
-<swiper class="screen-swiper bg-white square-dot padding-lr my-swiper" indicator-dots="true" circular="true" autoplay="true" interval="5000" duration="500">
+<swiper class="shadow-warp screen-swiper bg-white square-dot my-swiper" indicator-dots="true" style="margin:0 30rpx 20rpx" circular="true" autoplay="true" interval="5000" duration="500">
 	<swiper-item wx:for="{{swiperList}}" wx:key="key" bindtap="bindSwiperNav" data-song-id="{{item.songid}}">
-		<image style="border-radius:15rpx;" src="{{item.url}}" mode="aspectFill"></image>
+		<image class="shadow-blur"  style="border-radius:15rpx;" src="{{item.url}}" mode="aspectFill"></image>
 	</swiper-item>
 </swiper>
 <!-- 图标选择栏目 -->
-<view class="cu-list grid col-{{iconList.length}} no-border" style="padding:10rpx;">
+<view class="cu-list grid col-{{iconList.length}} no-border" style="padding:0;">
 	<view class="cu-item" wx:for="{{iconList}}" wx:key="key" bindtap="bindIconNav" data-cur-icon="{{item.urlname}}">
-		<view class='cuIcon-cu-image'>
-			<image src="/images/icon/{{item.urlname}}.png" style="width:80rpx;height:80rpx"></image>
+		<view class='cuIcon-cu-image' style="margin-top:0;">
+			<image class="shadow-blur" src="/images/icon/{{item.urlname}}.png" style="width:80rpx;height:80rpx;margin:10rpx"></image>
 		</view>
 		<text>{{item.name}}</text>
 	</view>
@@ -46,9 +46,9 @@
 		<scroll-view bindscroll="bindscroll" scroll-y scroll-top="0" style="height: 100%;">
 			<!-- 榜单列表 -->
 			<view class="cu-list menu-avatar">
-				<view class="cu-item" wx:for="{{item.songlist}}" wx:key="key" wx:for-item="song">
-					<view class="cu-avatar radius lg" style="background-image:url({{song.coverImg}});width:120rpx;height:120rpx;opacity:0.8;font-size: 3em;">{{index+1}}</view>
-					<view class="content" style="width:calc(100% - 120rpx - 60rpx - 200rpx - 20rpx);left:170rpx;line-height:2em;">
+				<view class="cu-item" style="height:170rpx" wx:for="{{item.songlist}}" wx:key="key" wx:for-item="song">
+					<view class="cu-avatar radius lg shadow-blur" style="background-image:url({{song.coverImg}});width:150rpx;height:150rpx;opacity:0.8;font-size: 3em;">{{index+1}}</view>
+					<view class="content" style="width:calc(100% - 150rpx - 60rpx - 200rpx - 20rpx);left:200rpx;line-height:2em;">
 						<text class="text-cut text-lg">{{song.name}}</text>
 						<view class="text-gray text-sm flex">
 							<text class="text-cut">{{song.singer}}</text>
@@ -67,6 +67,3 @@
 		</scroll-view>
 	</swiper-item>
 </swiper>
-
-<!-- 填补TabBar的空间 -->
-<view style="padding-top:100rpx"></view>

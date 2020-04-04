@@ -60,6 +60,13 @@
 					"id": -1,
 					"name": "pages/detail/rankList/rankList",
 					"pathName": "pages/detail/rankList/rankList",
+					"query": "",
+					"scene": null
+				},
+				{
+					"id": -1,
+					"name": "pages/tabbar/dynamic/dynamic",
+					"pathName": "pages/tabbar/dynamic/dynamic",
 					"scene": null
 				}
 			]

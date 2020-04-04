@@ -6,7 +6,9 @@
     "pages/tabbar/mine/mine",
     "pages/detail/search/search",
     "pages/detail/rankList/rankList",
-    "pages/detail/sendDynamic/sendDynamic"
+    "pages/detail/sendDynamic/sendDynamic",
+    "pages/detail/dynamicDetail/dynamicDetail",
+    "pages/detail/song/song"
   ],
   "window": {
     "navigationStyle": "custom"

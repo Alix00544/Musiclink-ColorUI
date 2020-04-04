@@ -24,3 +24,5 @@
     <view class="{{PageCur=='mine'?'text-red':'text-gray'}}">我的</view>
   </view>
 </view>
+<!-- 填补TabBar的空白 -->
+<view class='cu-tabbar-height'></view>
