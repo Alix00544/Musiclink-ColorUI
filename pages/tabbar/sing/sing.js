@@ -134,13 +134,13 @@ Page({
   bindscroll: function (e) {
     // 巧妙实现吸顶效果,棒棒哒
     // 当scroll-view向上滑时才可能会形成吸顶
-    if (e.detail.deltaY < 0 && e.detail.scrollTop < 50) {
+    if (e.detail.deltaY < 0 && e.detail.scrollTop < 100) {
       wx.pageScrollTo({
         scrollTop: this.data.WinHeight,
         duration: 40
       })
     }
-    if (e.detail.deltaY > 0 && e.detail.scrollTop < 30) {
+    if (e.detail.deltaY > 0 && e.detail.scrollTop < 50) {
       wx.pageScrollTo({
         scrollTop: 0,
         duration: 40

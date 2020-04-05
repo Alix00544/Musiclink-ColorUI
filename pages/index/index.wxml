@@ -5,24 +5,24 @@
 <!-- 自定义底部栏 -->
 <!-- TODO：点击动画还不知道怎么搞 -->
 <view class="cu-bar tabbar bg-white shadow foot">
-  <view class="action" bindtap="NavChange" data-cur="dynamic">
-    <view class='cuIcon-cu-image'>
-      <image src="/images/tabbar/dynamic{{PageCur=='dynamic'?'_cur':''}}.png"></image>
-    </view>
-    <view class="{{PageCur=='dynamic'?'text-red':'text-gray'}}">动态</view>
-  </view>
-  <view class="action add-action shadow" bindtap="NavChange" data-cur="sing">
-    <button class='cuIcon-cu-image'>
-      <image style="width:100%;height:100%" src="/images/tabbar/sing{{PageCur=='sing'?'_cur':''}}.png"></image>
-    </button>
-    <view class="{{PageCur=='sing'?'text-red':'text-gray'}}">唱歌</view>
-  </view>
-  <view class="action" bindtap="NavChange" data-cur="mine">
-    <view class='cuIcon-cu-image'>
-      <image src="/images/tabbar/mine{{PageCur=='mine'?'_cur':''}}.png"></image>
-    </view>
-    <view class="{{PageCur=='mine'?'text-red':'text-gray'}}">我的</view>
-  </view>
+	<view class="action" bindtap="NavChange" data-cur="dynamic">
+		<view class='cuIcon-cu-image'>
+			<image src="/images/tabbar/dynamic{{PageCur=='dynamic'?'_cur':''}}.png"></image>
+		</view>
+		<view class="{{PageCur=='dynamic'?'text-red':'text-gray'}}">动态</view>
+	</view>
+	<view class="action add-action shadow" bindtap="NavChange" data-cur="sing">
+		<view class='cuIcon-cu-image'>
+			<image style="width:100%;height:100%" src="/images/tabbar/sing{{PageCur=='sing'?'_cur':''}}.png"></image>
+		</view>
+		<view class="{{PageCur=='sing'?'text-red':'text-gray'}}">唱歌</view>
+	</view>
+	<view class="action" bindtap="NavChange" data-cur="mine">
+		<view class='cuIcon-cu-image'>
+			<image src="/images/tabbar/mine{{PageCur=='mine'?'_cur':''}}.png"></image>
+		</view>
+		<view class="{{PageCur=='mine'?'text-red':'text-gray'}}">我的</view>
+	</view>
 </view>
 <!-- 填补TabBar的空白 -->
 <view class='cu-tabbar-height'></view>

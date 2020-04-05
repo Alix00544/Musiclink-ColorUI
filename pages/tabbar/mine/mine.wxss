@@ -1,1 +1,29 @@
-/* pages/tabbar/mine/mine.wxss */
+.cu-avatar.xl {
+  width: 160rpx;
+  height: 160rpx;
+  font-size: 2.5em;
+}
+
+.my-flex-column {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.my-text-lg {
+  font-size: 45rpx;
+  font-weight: bold;
+}
+
+.content.my-nickname {
+  font-size: 60rpx;
+  margin-left: 240rpx;
+  text-align: left;
+  /* font-weight: bolder; */
+  color: white;
+}
+
+.my-avatar-lg{
+  font-size: 100rpx !important;
+}

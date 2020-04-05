@@ -1,5 +1,8 @@
 <cu-custom bgColor="bg-gradual-red" isBack="{{false}}">
-	<view slot="content">MusicLink</view>
+	<view slot="content">
+		<text class="cuIcon-home"></text>
+		MusicLink-连音符
+	</view>
 </cu-custom>
 <!-- 搜索栏 -->
 <view class="cu-bar bg-white search my-search-fixed">
@@ -18,14 +21,14 @@
 <!-- 轮播图 -->
 <swiper class="shadow-warp screen-swiper bg-white square-dot my-swiper" indicator-dots="true" style="margin:0 30rpx 20rpx" circular="true" autoplay="true" interval="5000" duration="500">
 	<swiper-item wx:for="{{swiperList}}" wx:key="key" bindtap="bindSwiperNav" data-song-id="{{item.songid}}">
-		<image class="shadow-blur"  style="border-radius:15rpx;" src="{{item.url}}" mode="aspectFill"></image>
+		<image class="shadow shadow-lg"  style="border-radius:15rpx;" src="{{item.url}}" mode="aspectFill"></image>
 	</swiper-item>
 </swiper>
 <!-- 图标选择栏目 -->
 <view class="cu-list grid col-{{iconList.length}} no-border" style="padding:0;">
 	<view class="cu-item" wx:for="{{iconList}}" wx:key="key" bindtap="bindIconNav" data-cur-icon="{{item.urlname}}">
 		<view class='cuIcon-cu-image' style="margin-top:0;">
-			<image class="shadow-blur" src="/images/icon/{{item.urlname}}.png" style="width:80rpx;height:80rpx;margin:10rpx"></image>
+			<image src="/images/icon/{{item.urlname}}.png" style="width:100rpx;height:100rpx;margin:10rpx;border-radius:38%;box-shadow:5rpx 5rpx 5rpx #e1e1e1;"></image>
 		</view>
 		<text>{{item.name}}</text>
 	</view>

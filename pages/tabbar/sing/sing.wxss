@@ -1,4 +1,3 @@
-/* pages/tabbar/sing/sing.wxss */
 page{
   background-color: white;
 }

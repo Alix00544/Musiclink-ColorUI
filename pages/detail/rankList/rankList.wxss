@@ -1,3 +1,6 @@
+page{
+  background-color: white;
+}
 .nav .cu-item.cur {
   border-bottom: 8rpx solid;
 }
