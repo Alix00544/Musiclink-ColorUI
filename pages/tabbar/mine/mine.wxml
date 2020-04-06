@@ -19,17 +19,17 @@
 		<view class="cu-bar" style="height:90px;margin-top:40px;">
 			<view class="action">
 				<view class="cu-avatar xl round margin-left {{hasLogin?'':'cuIcon-people my-avatar-lg'}}" style="{{hasLogin ? 'background-image:url('+user.avatar+')':''}}"></view>
-        <!--  -->
+				<!--  -->
 			</view>
 			<view class="content my-nickname" style="height:100%;line-height:90px;">
-        <text wx:if="{{hasLogin}}">{{user.nickname}}</text>
-        <!-- <text wx:if="{{!hasLogin}}">登录</text> -->
-        <button class="cu-btn text-white line-black" style="font-size:50rpx;height:50px" wx:if="{{!hasLogin}}">点击登录</button>
+				<text wx:if="{{hasLogin}}">{{user.nickname}}</text>
+				<text wx:if="{{!hasLogin}}">MusicLink</text>
+				<!-- <button class="cu-btn text-white line-black" style="font-size:50rpx;height:50px" wx:if="{{!hasLogin}}">点击登录</button> -->
 			</view>
 			<view class="action cuIcon-right text-white" style="font-size:1.6em">
 			</view>
 		</view>
-    <!-- 数据栏 -->
+		<!-- 数据栏 -->
 		<view class="cu-bar text-white" style="height:50px;justify-content:space-around;width:90%;margin:0 auto;">
 			<view class="my-flex-column">
 				<text class="my-text-lg">100</text>
@@ -49,6 +49,94 @@
 	</view>
 </view>
 
+
+
+<!-- 登录提示页面 -->
+<view class="box text-center flex align-center" style="height:{{WinHeight-StatusBar-180}}px;position: fixed;z-index: 1000;background-color: white;" wx:if="{{!hasLogin}}">
+	<view class="grid col-1 padding-sm">
+		<view class="">
+			<image src="../../../images/empty/empty-bear.png" mode="widthFix" style="width:150px"></image>
+		</view>
+		<view>你还没有登录呢~</view>
+		<view class="cu-bar btn-group padding-sm">
+			<button class="cu-btn bg-blue shadow-blur round lg" open-type='getUserInfo'    bindgetuserinfo='doLogin'>登录</button>
+		</view>
+	</view>
+</view>
+
+<view class="box" >
+	<!-- 播放历史，发布动态 -->
+	<view class="grid col-2 padding-lr-xl bg-white margin-bottom-sm">
+		<view class="padding-sm">
+			<view class="bg-white padding radius text-center shadow">
+				<view class="text-df" style="height:40rpx;">
+					<text class="cuIcon-timefill "></text>
+					播放历史</view>
+			</view>
+		</view>
+		<view class="padding-sm">
+			<view class="bg-white padding radius text-center shadow">
+				<view class="text-df" style="height:40rpx;">
+					<text class="cuIcon-writefill"></text>
+					发个动态</view>
+			</view>
+		</view>
+	</view>
+
+	<!-- 动态，作品，合唱 -->
+	<scroll-view scroll-x class="bg-white nav" style="height:90rpx;" id="selectView">
+		<view class="flex text-center">
+			<view class="cu-item flex-sub {{index==TabCur?'text-orange cur':''}}" wx:for="{{3}}" wx:key bindtap="tabSelect" data-id="{{index}}">
+				Tab{{index}}
+			</view>
+		</view>
+	</scroll-view>
+
+	<!--内容主体-->
+	<swiper hidden="{{!hasLogin}}" current="{{TabCur}}" duration="200" bindchange="swiperChange" style='height:{{WinHeight-CustomBar - 90 * ScreenWidth/750}}px'>
+
+		<!-- 动态 -->
+		<swiper-item class='bg-white'>
+			<scroll-view scroll-y="{{scrollViewScorll}}" scroll-top="0" style="height: 100%;" scroll-top="{{num}}">
+				<view class="bg-blue" style="height:100px">Tab0</view>
+				<view class="bg-black" style="height:100px">2</view>
+				<view class="bg-blue" style="height:100px">3</view>
+				<view class="bg-black" style="height:100px">4</view>
+				<view class="bg-blue" style="height:100px">5</view>
+				<view class="bg-black" style="height:100px">6</view>
+				<view class="bg-blue" style="height:100px">7</view>
+				<view class="bg-black" style="height:100px">8</view>
+				<view class="bg-blue" style="height:100px">9</view>
+				<view class="bg-black" style="height:100px">10</view>
+			</scroll-view>
+		</swiper-item>
+
+		<!-- 作品 -->
+		<swiper-item class='bg-white'>
+			<scroll-view scroll-y="{{scrollViewScorll}}" scroll-top="0" style="height: 100%;">
+				<view class="bg-blue" style="height:100px">Tab1</view>
+				<view class="bg-black" style="height:100px">2</view>
+				<view class="bg-blue" style="height:100px">3</view>
+				<view class="bg-black" style="height:100px">4</view>
+				<view class="bg-blue" style="height:100px">5</view>
+				<view class="bg-black" style="height:100px">6</view>
+				<view class="bg-blue" style="height:100px">7</view>
+				<view class="bg-black" style="height:100px">8</view>
+				<view class="bg-blue" style="height:100px">9</view>
+				<view class="bg-black" style="height:100px">10</view>
+			</scroll-view>
+		</swiper-item>
+
+		<!-- 合唱 -->
+		<swiper-item class='bg-white'>
+			<scroll-view scroll-y="{{scrollViewScorll}}" scroll-top="0" style="height: 100%;">
+				<view class="bg-blue" style="height:100px">Tab3</view>
+				<view class="bg-black" style="height:100px">2</view>
+			</scroll-view>
+		</swiper-item>
+	</swiper>
+
+</view>
 
 <!-- <view class="bg-blue" style="height:100px">1</view>
 <view class="bg-black" style="height:100px">2</view>

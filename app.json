@@ -1,8 +1,7 @@
 {
   "pages": [
-    "pages/index/index",
-    "pages/tabbar/dynamic/dynamic",
     "pages/tabbar/sing/sing",
+    "pages/tabbar/dynamic/dynamic",
     "pages/tabbar/mine/mine",
     "pages/detail/search/search",
     "pages/detail/rankList/rankList",
@@ -13,6 +12,32 @@
   ],
   "window": {
     "navigationStyle": "custom"
+  },
+  "tabBar": {
+    "color": "#7A7E83",
+    "selectedColor": "#e54d42",
+    "borderStyle": "black",
+    "backgroundColor": "#ffffff",
+    "list": [
+      {
+        "pagePath": "pages/tabbar/dynamic/dynamic",
+        "text": "动态",
+        "iconPath": "images/tabbar/dynamic.png",
+        "selectedIconPath": "images/tabbar/dynamic_cur.png"
+      },
+      {
+        "pagePath": "pages/tabbar/sing/sing",
+        "text": "唱歌",
+        "iconPath": "images/tabbar/sing.png",
+        "selectedIconPath": "images/tabbar/sing_cur.png"
+      },
+      {
+        "pagePath": "pages/tabbar/mine/mine",
+        "text": "我的",
+        "iconPath": "images/tabbar/mine.png",
+        "selectedIconPath": "images/tabbar/mine_cur.png"
+      }
+    ]
   },
   "usingComponents": {
     "cu-custom": "/colorui/components/cu-custom"

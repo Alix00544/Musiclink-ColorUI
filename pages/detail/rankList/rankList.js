@@ -4,7 +4,8 @@ Page({
     TabCur: 0,
     scrollLeft: 0,
     CustomBar: app.globalData.CustomBar,
-    WinHeight:app.globalData.WinHeight,
+    ScreenHeight:app.globalData.ScreenHeight,
+    ScreenWidth:app.globalData.ScreenWidth,
     ranklist: [{
       rankname: "热门榜",
       songlist: [{

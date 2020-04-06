@@ -2,14 +2,14 @@
 	<view slot="content">排行榜</view>
 </cu-custom>
 <!-- 选择栏 -->
-<scroll-view scroll-x class="bg-white nav text-center my-border-bottom" scroll-with-animation scroll-left="{{scrollLeft}}">
+<scroll-view scroll-x class="bg-white nav text-center my-border-bottom" scroll-with-animation scroll-left="{{scrollLeft}}" style="height:90rpx">
 	<view class="cu-item {{index==TabCur?'text-red cur text-bold':'text-gray'}} text-lg" wx:for="{{ranklist}}" wx:key="key" bindtap="tabSelect" data-id="{{index}}">
 		{{item.rankname}}
 	</view>
 </scroll-view>
 
 <!--内容主体-->
-<swiper current="{{TabCur}}" duration="200" bindchange="swiperChange" style='height:{{WinHeight-CustomBar-45}}px'>
+<swiper current="{{TabCur}}" duration="200" bindchange="swiperChange" style='height:{{ScreenHeight-CustomBar-90 * ScreenWidth/750}}px'>
 	<swiper-item class='bg-white' wx:for="{{ranklist}}" wx:key="key">
 		<scroll-view bindscrolltoupper="upper" scroll-y style="height: 100%;">
 			<!-- 榜单列表 -->

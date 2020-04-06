@@ -7,7 +7,7 @@ page{
 }
 
 .nav .cu-item.cur {
-  border-bottom: 6rpx solid;
+  border-bottom: 10rpx solid;
 }
 
 .my-search-fixed {

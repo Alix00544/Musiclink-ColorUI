@@ -36,6 +36,8 @@ Page({
     scrollLeft: 0,
     CustomBar: app.globalData.CustomBar,
     WinHeight: app.globalData.WinHeight,
+    ScreenWidth:app.globalData.ScreenWidth,
+    scrollViewScorll:false,
     ranklist: [{
       rankname: "热门榜",
       songlist: [{
@@ -93,6 +95,30 @@ Page({
         name: "温柔33",
         singer: "五月天",
         coverImg: "https://p1.music.126.net/s47PMA_wT4IF5HFKfDxhzg==/109951164836564113.jpg"
+      },{
+        name: "温柔11",
+        singer: "五月天",
+        coverImg: "https://p1.music.126.net/s47PMA_wT4IF5HFKfDxhzg==/109951164836564113.jpg"
+      }, {
+        name: "温柔22",
+        singer: "五月天",
+        coverImg: "https://p1.music.126.net/s47PMA_wT4IF5HFKfDxhzg==/109951164836564113.jpg"
+      }, {
+        name: "温柔33",
+        singer: "五月天",
+        coverImg: "https://p1.music.126.net/s47PMA_wT4IF5HFKfDxhzg==/109951164836564113.jpg"
+      },{
+        name: "温柔11",
+        singer: "五月天",
+        coverImg: "https://p1.music.126.net/s47PMA_wT4IF5HFKfDxhzg==/109951164836564113.jpg"
+      }, {
+        name: "温柔22",
+        singer: "五月天",
+        coverImg: "https://p1.music.126.net/s47PMA_wT4IF5HFKfDxhzg==/109951164836564113.jpg"
+      }, {
+        name: "温柔33",
+        singer: "五月天",
+        coverImg: "https://p1.music.126.net/s47PMA_wT4IF5HFKfDxhzg==/109951164836564113.jpg"
       }]
     }, {
       rankname: "抖音榜",
@@ -109,10 +135,50 @@ Page({
         singer: "五月天",
         coverImg: "https://p1.music.126.net/s47PMA_wT4IF5HFKfDxhzg==/109951164836564113.jpg"
       }]
+    },{
+      rankname: "抖音榜2",
+      songlist: [{
+        name: "抖音榜2",
+        singer: "五月天",
+        coverImg: "https://p1.music.126.net/s47PMA_wT4IF5HFKfDxhzg==/109951164836564113.jpg"
+      }]
+    },{
+      rankname: "抖音榜3",
+      songlist: [{
+        name: "抖音榜3",
+        singer: "五月天",
+        coverImg: "https://p1.music.126.net/s47PMA_wT4IF5HFKfDxhzg==/109951164836564113.jpg"
+      }]
+    },{
+      rankname: "抖音榜4",
+      songlist: [{
+        name: "抖音榜4",
+        singer: "五月天",
+        coverImg: "https://p1.music.126.net/s47PMA_wT4IF5HFKfDxhzg==/109951164836564113.jpg"
+      }]
+    },{
+      rankname: "抖音榜5",
+      songlist: [{
+        name: "抖音榜5",
+        singer: "五月天",
+        coverImg: "https://p1.music.126.net/s47PMA_wT4IF5HFKfDxhzg==/109951164836564113.jpg"
+      }]
+    },{
+      rankname: "抖音榜6",
+      songlist: [{
+        name: "抖音榜6",
+        singer: "五月天",
+        coverImg: "https://p1.music.126.net/s47PMA_wT4IF5HFKfDxhzg==/109951164836564113.jpg"
+      }]
     }]
   },
   onLoad: function (options) {
-
+    var that = this;
+    wx.createSelectorQuery().select('#selectView').boundingClientRect(function(rect){
+      that.setData({
+        scrollViewEnableHeight:rect.top - that.data.CustomBar - 100 *that.data.ScreenWidth/750
+      })
+    }).exec();
   },
   /** 排行榜切换 */
   tabSelect(e) {
@@ -125,33 +191,53 @@ Page({
   swiperChange: function (e) {
     this.setData({
       TabCur: e.detail.current,
+      scrollLeft: (e.detail.current - 1) * 60
     })
   },
   bindSing: function (e) {
     console.log(e.currentTarget.dataset.song);
     // TODO:跳转至唱歌界面
   },
-  bindscroll: function (e) {
-    // 巧妙实现吸顶效果,棒棒哒
-    // 当scroll-view向上滑时才可能会形成吸顶
-    if (e.detail.deltaY < 0 && e.detail.scrollTop < 100) {
-      wx.pageScrollTo({
-        scrollTop: this.data.WinHeight,
-        duration: 40
-      })
-    }
-    if (e.detail.deltaY > 0 && e.detail.scrollTop < 50) {
-      wx.pageScrollTo({
-        scrollTop: 0,
-        duration: 40
-      })
+  // 原来实现的吸顶方法，废弃，太卡顿了
+  // bindscroll: function (e) {
+  //   // 巧妙实现吸顶效果,棒棒哒
+  //   // 当scroll-view向上滑时才可能会形成吸顶
+  //   console.log(e)
+  //   if (e.detail.deltaY < 0) {
+  //     wx.pageScrollTo({
+  //       scrollTop: this.data.WinHeight,
+  //       duration: 30
+  //     })
+  //   }
+  //   if (e.detail.deltaY > 0 && e.detail.scrollTop < 10) {
+  //     wx.pageScrollTo({
+  //       scrollTop: 0,
+  //       duration: 30
+  //     })
+  //   }
+  // },
+  onPageScroll: function (e) {
+    // console.log(e.scrollTop)
+    var scrollViewScorll = this.data.scrollViewScorll;
+    if (e.scrollTop < this.data.scrollViewEnableHeight - 5) {
+      if(scrollViewScorll){
+        this.setData({
+          scrollViewScorll: false
+        })
+      }
+    } else {
+      if(!scrollViewScorll){
+        this.setData({
+          scrollViewScorll: true
+        })
+      }
     }
   },
   /** 图标栏 */
   bindIconNav: function (e) {
     var pageName = e.currentTarget.dataset.curIcon;
     wx.navigateTo({
-      url: `../detail/${pageName}/${pageName}`
+      url: `../../detail/${pageName}/${pageName}`
     })
   },
   /** 轮播图跳转 */
@@ -162,7 +248,7 @@ Page({
   /** 搜索栏操作函数 */
   bindSearch: function (e) {
     wx.navigateTo({
-      url: "../detail/search/search?searchValue=" + this.data.searchValue
+      url: "../../detail/search/search?searchValue=" + this.data.searchValue
     })
     this.setData({
       searchValue: ""

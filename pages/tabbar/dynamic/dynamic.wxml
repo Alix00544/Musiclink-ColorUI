@@ -14,7 +14,7 @@
 <view style="padding-top:{{CustomBar}}px"></view>
 
 <!--内容主体-->
-<swiper current="{{currentTab}}" style='height: {{WinHeight-50-CustomBar}}px' duration="200" bindchange="swiperChange">
+<swiper current="{{currentTab}}" style='height: {{WinHeight-CustomBar}}px' duration="200" bindchange="swiperChange">
 
 	<!--热门-->
 	<swiper-item>

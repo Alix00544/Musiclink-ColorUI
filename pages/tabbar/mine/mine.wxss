@@ -27,3 +27,7 @@
 .my-avatar-lg{
   font-size: 100rpx !important;
 }
+
+.nav .cu-item.cur {
+  border-bottom: 10rpx solid;
+}
