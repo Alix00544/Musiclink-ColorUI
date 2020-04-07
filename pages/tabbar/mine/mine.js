@@ -3,73 +3,214 @@ const util = require('../../../utils/util');
 Page({
 
   data: {
+    // 系统数据
     StatusBar: app.globalData.StatusBar,
     CustomBar: app.globalData.CustomBar,
     WinHeight: app.globalData.WinHeight,
     ScreenWidth: app.globalData.ScreenWidth,
+    // 用户登录
+    canIUse: wx.canIUse('button.open-type.getUserInfo'),
+    hasUserInfo: false,
+    // 顶部栏渐变
     navBarOpacity: 0,
     navBarFrontColor: "#ffffff",
-    hasLogin: false,
-    user: {
-      nickname: "Alix1997",
-      avatar: "https://ossweb-img.qq.com/images/lol/web201310/skin/big99008.jpg",
-      upNum: 50,
-      dynamic: [],
-      // 现在还不知道怎么表示作品，暂时这样
-      compositionNum: 100
-    },
+    // 用户栏背景图片
     bgImg: "https://s1.ax1x.com/2020/04/05/Gr0HN4.jpg",
+    // 选择栏数据
     TabCur: 0,
-    scrollViewScorll: false
+    scrollViewScorll: false,
+    selectList: ['动态', '作品', '合唱'],
+    upNums: 0
   },
 
   onLoad: function (options) {
     var that = this;
-
-    wx.createSelectorQuery().select('#selectView').boundingClientRect(function(rect){
+    // 选择栏定位
+    wx.createSelectorQuery().select('#selectView').boundingClientRect(function (rect) {
       that.setData({
-        scrollViewEnableHeight:rect.top - that.data.CustomBar
+        userInfo: app.globalData.userInfo,
+        hasUserInfo: Boolean(app.globalData.userInfo),
+        scrollViewEnableHeight: rect.top - that.data.CustomBar
       })
     }).exec();
+    var openid;
+    if (openid = wx.getStorageSync('openid')) {
+      // this.postSong({user_id:openid,song_id:1});
+      // this.postSong({user_id:openid,song_id:2});
+      // this.postSong({user_id:openid,song_id:4});
+      // this.postDynamic({user_id:openid,list_id:1,content:'折磨生出苦难，苦难又会加剧折磨，凡间这无穷的循环，将有我来终结！',pictures:2});
+      // this.postDynamic({user_id:openid,list_id:3,content:'凡间这无穷的循环，将有我来终结！'});
+      // this.postDynamic({user_id:openid,list_id:2,content:'凡间这无穷的循环，将有我来终结！'});
+      // this.postDynamic({user_id:openid,list_id:4,content:'凡间这无穷的循环，将有我来终结！'});
+      this.getDynamic({ user_id: openid });
+    }
   },
   onShow: function () {
 
   },
-  doLogin:function(e){
-    // getUserInfo 
-    console.log(e);
-    var userInfo = e.detail.userInfo;
-    // 用户登录，从微信服务器获取临时凭证code
-    wx.login({
-      success (res) {
-        console.log(res);
-        if (res.code) {
-          // 用户登录，向服务器传递临时凭证code，以便服务器获取openid
-          util.requestFromServer('login',{code:res.code},'POST').then(res=>{
-            console.log('login success');
-            console.log(res);
-            var data={
-              openid:'oCHaq5VTb6qOnVYXMI_DFxtXzG2Q',
-              name:userInfo.nickName,
-              gender:userInfo.gender,
-              portrait_url:userInfo.avatarUrl,
-              area:userInfo.city
-            };
-            // 用户注册，根据获得的userinfo向服务器更新数据
-            util.requestFromServer('register',data,'POST').then(res=>{
-              console.log('register success');
-              console.log(res);
-            }).catch(err=>{
-              console.log('register error');
-            })
-          }).catch(err=>{
-            console.log('login error');
+  onPageScroll: function (e) {
+    // 实现吸顶效果
+    var scrollTop = e.scrollTop;
+    var scrollViewScorll = this.data.scrollViewScorll;
+    if (e.scrollTop < this.data.scrollViewEnableHeight - 1) {
+      // 减1是因为，定位值有偏差，但不大
+      if (scrollViewScorll) {
+        this.setData({
+          scrollViewScorll: false
+        })
+      }
+    } else {
+      if (!scrollViewScorll) {
+        this.setData({
+          scrollViewScorll: true
+        })
+      }
+    }
+    // 实现顶部栏渐变效果，设置透明度变化
+    this.setOpacity(scrollTop, this.data.scrollViewEnableHeight - 10);
+  },
+  bindDeleteDynamic: function (e) {
+    var dynamicId = e.currentTarget.dataset.dynamicId;
+    var that = this;
+    wx.showModal({
+      title: '提示',
+      content: '确认删除该动态么？',
+      success(res) {
+        if (res.confirm) {
+          util.requestFromServer(`dynamic?id=${dynamicId}`, {}, 'DELETE').then(res => {
+            console.log('用户删除了动态', res);
+            if (res.data.status == 200) {
+              var list = that.data.dynamicList;
+              var images;
+              for (let i = 0; i < list.length; i++) {
+                if (list[i].dynamicId == dynamicId) {
+                  images = list[i].images;
+                  list.splice(i, 1);
+                  break;
+                }
+              }
+              that.setData({
+                dynamicList: list
+              })
+              // TODO 将对象存储中的图片删除
+            }
           })
-        } else {
-          console.log('登录失败！' + res.errMsg)
+        } else if (res.cancel) {
+          console.log('用户点击了取消')
         }
       }
     })
+  },
+  /** 获取动态信息 */
+  getDynamic(data) {
+    var that = this;
+    var dynamicList = [];
+    var upNums = 0;
+    util.requestFromServer('dynamic', data, 'GET').then(res => {
+      if (res.data.data) {
+        console.log('dynamic', res);
+        res.data.data.forEach(v => {
+          var data = {
+            dynamicId: v.id,
+            senderAvatar: app.globalData.userInfo.avatarUrl,
+            senderNickName: app.globalData.userInfo.nickName,
+            creatTime: v.create_time,
+            sendTime: util.getShowTime(v.create_time),
+            content: v.content,
+            images: [],
+            upNum: v.thumbs,
+            commentsNum: v.comments,
+            comments: [],
+            paticipators:v.paticipators,
+            song:{
+              id: v.list_id,
+              cover: v.cover_url,
+              url: v.source_url,
+              name: v.title,
+              score: v.scores,
+              needChorus: v.is_private,
+              listenNum: v.listens
+            }
+          }
+          upNums += v.thumbs;
+          // 添加图片信息
+          for (let i = 0; i < v.pictures; i++) {
+            data.images.push(`https://test-1301509754.file.myqcloud.com/records/pictures/1/${i + 1}.jpg`);
+          }
+          dynamicList.push(data);
+        })
+      }
+    }).then(res => {
+      that.setData({
+        dynamicList: dynamicList,
+        upNums: upNums
+      })
+      wx.setStorageSync('myDynamicList', dynamicList);
+    }).catch(err => {
+      console.log('获取用户动态失败', err)
+    })
+  },
+  postSong(data) {
+    util.requestFromServer('singlist', data, 'POST').then(res => {
+      console.log(res);
+    }).catch(err => {
+      console.log('发起用户动态失败')
+    })
+  },
+  postDynamic(data) {
+    util.requestFromServer('dynamic', data, 'POST').then(res => {
+      console.log(res);
+    }).catch(err => {
+      console.log('发起用户动态失败')
+    })
+  },
+  /** 用户登录 */
+  doLogin: function (e) {
+    if (e.detail.errMsg == "getUserInfo:ok") {
+      // getUserInfo 
+      console.log(e);
+      var userInfo = e.detail.userInfo;
+      // 更新数据
+      app.globalData.userInfo = userInfo;
+      this.setData({
+        hasUserInfo: true,
+        userInfo: userInfo
+      })
+      // 用户登录，从微信服务器获取临时凭证code
+      wx.login({
+        success(res) {
+          console.log(res);
+          if (res.code) {
+            // 用户登录，向服务器传递临时凭证code，以便服务器获取openid
+            util.requestFromServer('login', { code: res.code }, 'POST').then(res => {
+              console.log('login success');
+              console.log(res);
+              var data = {
+                openid: res.data.data.insert_id,
+                name: userInfo.nickName,
+                gender: userInfo.gender,
+                portrait_url: userInfo.avatarUrl,
+                area: userInfo.city
+              };
+              console.log(data);
+              wx.setStorageSync('openid', res.data.data.insert_id);
+
+              // 用户注册，根据获得的userinfo向服务器更新数据
+              util.requestFromServer('register', data, 'POST').then(res => {
+                console.log('register success');
+                console.log(res);
+              }).catch(err => {
+                console.log('register error');
+              })
+            }).catch(err => {
+              console.log('login error');
+            })
+          } else {
+            console.log('登录失败！' + res.errMsg)
+          }
+        }
+      })
+    }
   },
   /** 动态，作品，合唱切换 */
   tabSelect(e) {
@@ -77,33 +218,17 @@ Page({
       TabCur: e.currentTarget.dataset.id
     })
   },
-  // 滑动切换页面
   swiperChange: function (e) {
+    // 滑动切换页面
     this.setData({
       TabCur: e.detail.current,
     })
   },
-
-
-
   /** 顶部导航栏函数 */
   bindSetting: function (e) {
-
-  },
-  onPageScroll: function (e) {
-    // 实现吸顶效果
-    var scrollTop = e.scrollTop;
-    if (e.scrollTop < this.data.scrollViewEnableHeight - 1) {
-      this.setData({
-        scrollViewScorll: false
-      })
-    } else {
-      this.setData({
-        scrollViewScorll: true
-      })
-    }
-    // 设置顶部栏透明度变化，实现渐出效果
-    this.setOpacity(scrollTop, 150);
+    wx.navigateTo({
+      url: '../../detail/settings/settings',
+    })
   },
   // 顶部栏opacity变化函数
   setOpacity: function (scrollTop, maxTop) {
@@ -123,9 +248,11 @@ Page({
         backgroundColor: navBarFrontColor
       })
     }
-    this.setData({
-      navBarOpacity: opacity,
-      navBarFrontColor: navBarFrontColor
-    })
+    if (this.data.navBarOpacity != opacity) {
+      this.setData({
+        navBarOpacity: opacity,
+        navBarFrontColor: navBarFrontColor
+      })
+    }
   }
 })

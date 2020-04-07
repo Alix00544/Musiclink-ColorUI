@@ -217,7 +217,6 @@ Page({
   //   }
   // },
   onPageScroll: function (e) {
-    // console.log(e.scrollTop)
     var scrollViewScorll = this.data.scrollViewScorll;
     if (e.scrollTop < this.data.scrollViewEnableHeight - 5) {
       if(scrollViewScorll){

@@ -8,7 +8,8 @@
     "pages/detail/sendDynamic/sendDynamic",
     "pages/detail/dynamicDetail/dynamicDetail",
     "pages/detail/song/song",
-    "pages/detail/singer/singer"
+    "pages/detail/singer/singer",
+    "pages/detail/settings/settings"
   ],
   "window": {
     "navigationStyle": "custom"

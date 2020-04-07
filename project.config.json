@@ -89,6 +89,13 @@
 					"id": -1,
 					"name": "pages/tabbar/mine/mine",
 					"pathName": "pages/tabbar/mine/mine",
+					"query": "",
+					"scene": null
+				},
+				{
+					"id": -1,
+					"name": "pages/detail/settings/settings",
+					"pathName": "pages/detail/settings/settings",
 					"scene": null
 				}
 			]

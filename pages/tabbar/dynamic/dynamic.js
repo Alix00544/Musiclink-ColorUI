@@ -101,7 +101,7 @@ Page({
   //跳转到搜索页面
   navToSearch:function(e){
     wx.navigateTo({
-      url:"../detail/search/search"
+      url:"../../detail/search/search"
     })
   },
   /** 动态中的函数 */

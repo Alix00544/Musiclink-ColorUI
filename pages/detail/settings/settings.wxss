@@ -1,0 +1,11 @@
+.font-normal {
+  font-weight: normal;
+}
+
+.cu-list.menu>.cu-item {
+  height: 110rpx;
+}
+
+.cu-list.menu>.cu-item .content {
+  font-size: 34rpx;
+}

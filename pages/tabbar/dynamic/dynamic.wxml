@@ -74,13 +74,13 @@
 							<text class="cuIcon-share margin-lr-xs"></text>
 							<text style="font-size:30rpx">分享</text>
 						</view>
-						<view class="flex align-center" catchtap="catchUp" data-dynamic-id="{{item.dynamicId}}">
-							<text class="cuIcon-appreciate margin-lr-xs"></text>
-							<text style="font-size:30rpx">{{item.upNum}}</text>
-						</view>
 						<view class="flex align-center" catchtap="catchComments" data-dynamic-id="{{item.dynamicId}}">
 							<text class="cuIcon-message margin-lr-xs"></text>
 							<text style="font-size:30rpx">{{item.commentsNum}}</text>
+						</view>
+						<view class="flex align-center" catchtap="catchUp" data-dynamic-id="{{item.dynamicId}}">
+							<text class="cuIcon-appreciate margin-lr-xs"></text>
+							<text style="font-size:30rpx">{{item.upNum}}</text>
 						</view>
 					</view>
 				</view>
@@ -108,9 +108,9 @@
 	</swiper-item>
 </swiper>
 
-
+<!-- 底部评论弹窗 -->
 <view class="cu-modal bottom-modal {{showComments?'show':''}}" bindtap="bindHideComments">
-	<view class="cu-dialog" style="height:60%;">
+	<view class="cu-dialog" style="height:60%;" catchtap>
 		<view class="cu-bar bg-white">
 			<view class="action text-green">确定</view>
 			<view class="action text-blue" bindtap="bindHideComments">取消</view>

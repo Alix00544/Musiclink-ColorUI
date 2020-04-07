@@ -31,3 +31,6 @@
 .nav .cu-item.cur {
   border-bottom: 10rpx solid;
 }
+.my-border-bottom{
+  border-bottom: 1px solid #f1f1f1;
+}

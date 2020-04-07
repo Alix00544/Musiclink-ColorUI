@@ -1,0 +1,80 @@
+<cu-custom bgColor="bg-white" isBack="{{true}}">
+	<view slot="backText">
+		设置
+	</view>
+</cu-custom>
+
+<view class="cu-list menu sm-border">
+
+	<view class="cu-item arrow">
+		<view class="content">
+			<text class="cuIcon-camerafill text-green"></text>
+			<text class="text-black">头像</text>
+		</view>
+		<view class="action">
+			<view class="cu-avatar round lg" style="background-image:url(https://ossweb-img.qq.com/images/lol/web201310/skin/big10001.jpg);"></view>
+		</view>
+	</view>
+	<view class="cu-item arrow">
+		<view class="content">
+			<text class="cuIcon-edit text-cyan"></text>
+			<text class="text-black">昵称</text>
+		</view>
+		<view class="action">
+			<text class="text-black text-xl">Alix1997</text>
+		</view>
+	</view>
+	<view class="cu-item arrow">
+		<view class="content">
+			<text class="cuIcon-male text-green"></text>
+			<text class="text-black">性别</text>
+		</view>
+		<view class="action">
+			<switch class="switch-sex sm" bindchange="switchSex"></switch>
+		</view>
+	</view>
+
+	<view class="cu-item arrow">
+		<view class="content">
+			<text class="cuIcon-picfill text-blue"></text>
+			<text class="text-black">背景图片</text>
+		</view>
+	</view>
+
+	<view class="cu-item arrow margin-top">
+		<button class="cu-btn content font-normal" open-type="contact">
+			<text class="cuIcon-servicefill text-olive"></text>
+			<text class="text-black">客服</text>
+		</button>
+	</view>
+	<view class="cu-item arrow">
+		<button class="cu-btn content font-normal" open-type="openSetting">
+			<text class="cuIcon-circlefill text-green"></text>
+			<text class="text-black">授权</text>
+		</button>
+	</view>
+	<view class="cu-item arrow">
+		<button class="cu-btn content font-normal" open-type="feedback">
+			<text class="cuIcon-repairfill text-yellow"></text>
+			<text class="text-black">帮助与反馈</text>
+		</button>
+	</view>
+	<view class="cu-item arrow margin-top">
+		<view class="content">
+			<text class="cuIcon-redpacket_fill text-red"></text>
+			<text class="text-black">赞赏</text>
+		</view>
+	</view>
+
+
+	<navigator class="cu-item arrow" hover-class="none" url="../about/about" open-type="redirect">
+		<view class="content">
+			<text class="cuIcon-discoverfill text-orange"></text>
+			<text class="text-black">关于连音符</text>
+		</view>
+    		<view class="action">
+			<view class="cu-tag round bg-orange light">音乐</view>
+			<view class="cu-tag round bg-olive light">合唱</view>
+		</view>
+	</navigator>
+</view>

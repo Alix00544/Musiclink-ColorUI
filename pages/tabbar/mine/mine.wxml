@@ -2,10 +2,10 @@
 <view class="cu-custom">
 	<!-- 直接将opacity渐变加在整体上，会导致设置icon也跟着渐变，为了解决这个问题，将opacity设置在背景色rgba上 -->
 	<view class="cu-bar fixed" style="height:{{CustomBar}}px;padding-top:{{StatusBar}}px;background:rgba(255,255,255,{{navBarOpacity}})">
-		<view class="action  cuIcon-settings{{navBarOpacity==1? ' text-black':'fill text-white'}}" bindtap="bindSetting" style="font-size:1.7em">
+		<view class="action  cuIcon-settings{{navBarOpacity>0.6? ' text-black':'fill text-white'}}" bindtap="bindSetting" style="font-size:1.7em;">
 		</view>
 		<view class="content" style="top:{{StatusBar}}px">
-			<view class="text-cut text-black" wx:if="{{navBarOpacity == 1}}">Alix1997</view>
+			<view class="text-cut text-black text-bold" wx:if="{{navBarOpacity > 0.6}}" style="opacity:{{navBarOpacity}}">{{userInfo.nickName}}</view>
 		</view>
 	</view>
 </view>
@@ -18,13 +18,13 @@
 	<view style="width:100%;height:{{180 + StatusBar}}px;padding-top:{{StatusBar}}px;position:absolute;top:0;left:0">
 		<view class="cu-bar" style="height:90px;margin-top:40px;">
 			<view class="action">
-				<view class="cu-avatar xl round margin-left {{hasLogin?'':'cuIcon-people my-avatar-lg'}}" style="{{hasLogin ? 'background-image:url('+user.avatar+')':''}}"></view>
+				<view class="cu-avatar xl round margin-left {{hasUserInfo?'':'cuIcon-people my-avatar-lg'}}" style="{{hasUserInfo ? 'background-image:url('+userInfo.avatarUrl+')':''}}"></view>
 				<!--  -->
 			</view>
 			<view class="content my-nickname" style="height:100%;line-height:90px;">
-				<text wx:if="{{hasLogin}}">{{user.nickname}}</text>
-				<text wx:if="{{!hasLogin}}">MusicLink</text>
-				<!-- <button class="cu-btn text-white line-black" style="font-size:50rpx;height:50px" wx:if="{{!hasLogin}}">点击登录</button> -->
+				<text wx:if="{{hasUserInfo}}">{{userInfo.nickName}}</text>
+				<text wx:if="{{!hasUserInfo}}">MusicLink</text>
+				<!-- <button class="cu-btn text-white line-black" style="font-size:50rpx;height:50px" wx:if="{{!hasUserInfo}}">点击登录</button> -->
 			</view>
 			<view class="action cuIcon-right text-white" style="font-size:1.6em">
 			</view>
@@ -32,18 +32,18 @@
 		<!-- 数据栏 -->
 		<view class="cu-bar text-white" style="height:50px;justify-content:space-around;width:90%;margin:0 auto;">
 			<view class="my-flex-column">
+				<text class="my-text-lg">{{dynamicList.length}}</text>
+				<text style="font-size: 30rpx;">动态</text>
+			</view>
+			<view class="cuIcon-titles"></view>
+			<view class="my-flex-column">
 				<text class="my-text-lg">100</text>
 				<text style="font-size: 30rpx;">作品</text>
 			</view>
 			<view class="cuIcon-titles"></view>
 			<view class="my-flex-column">
-				<text class="my-text-lg">50</text>
+				<text class="my-text-lg">{{upNums}}</text>
 				<text style="font-size: 30rpx;">获赞</text>
-			</view>
-			<view class="cuIcon-titles"></view>
-			<view class="my-flex-column">
-				<text class="my-text-lg">0</text>
-				<text style="font-size: 30rpx;">动态</text>
 			</view>
 		</view>
 	</view>
@@ -52,19 +52,20 @@
 
 
 <!-- 登录提示页面 -->
-<view class="box text-center flex align-center" style="height:{{WinHeight-StatusBar-180}}px;position: fixed;z-index: 1000;background-color: white;" wx:if="{{!hasLogin}}">
+<view class="box text-center flex align-center" style="height:{{WinHeight-StatusBar-180}}px;position: fixed;z-index: 1000;background-color: white;" wx:if="{{!hasUserInfo}}">
 	<view class="grid col-1 padding-sm">
 		<view class="">
 			<image src="../../../images/empty/empty-bear.png" mode="widthFix" style="width:150px"></image>
 		</view>
 		<view>你还没有登录呢~</view>
 		<view class="cu-bar btn-group padding-sm">
-			<button class="cu-btn bg-blue shadow-blur round lg" open-type='getUserInfo'    bindgetuserinfo='doLogin'>登录</button>
+			<button wx:if="{{canIUse}}" class="cu-btn bg-blue shadow-blur round lg" open-type='getUserInfo' bindgetuserinfo='doLogin'>登录</button>
+			<view wx:else>微信版本过低，无法登录，请升级微信版本</view>
 		</view>
 	</view>
 </view>
 
-<view class="box" >
+<view class="box">
 	<!-- 播放历史，发布动态 -->
 	<view class="grid col-2 padding-lr-xl bg-white margin-bottom-sm">
 		<view class="padding-sm">
@@ -84,36 +85,92 @@
 	</view>
 
 	<!-- 动态，作品，合唱 -->
-	<scroll-view scroll-x class="bg-white nav" style="height:90rpx;" id="selectView">
+	<scroll-view scroll-x class="bg-white nav my-border-bottom" style="height:90rpx;" id="selectView">
 		<view class="flex text-center">
-			<view class="cu-item flex-sub {{index==TabCur?'text-orange cur':''}}" wx:for="{{3}}" wx:key bindtap="tabSelect" data-id="{{index}}">
-				Tab{{index}}
+			<view class="cu-item flex-sub {{index==TabCur?'text-red text-bold cur':''}}" wx:for="{{selectList}}" wx:key='selectList' bindtap="tabSelect" data-id="{{index}}">
+				{{item}}
 			</view>
 		</view>
 	</scroll-view>
 
 	<!--内容主体-->
-	<swiper hidden="{{!hasLogin}}" current="{{TabCur}}" duration="200" bindchange="swiperChange" style='height:{{WinHeight-CustomBar - 90 * ScreenWidth/750}}px'>
+	<swiper  current="{{TabCur}}" duration="200" bindchange="swiperChange" style='height:{{WinHeight-CustomBar - 90 * ScreenWidth/750}}px'>
 
 		<!-- 动态 -->
 		<swiper-item class='bg-white'>
-			<scroll-view scroll-y="{{scrollViewScorll}}" scroll-top="0" style="height: 100%;" scroll-top="{{num}}">
-				<view class="bg-blue" style="height:100px">Tab0</view>
-				<view class="bg-black" style="height:100px">2</view>
-				<view class="bg-blue" style="height:100px">3</view>
-				<view class="bg-black" style="height:100px">4</view>
-				<view class="bg-blue" style="height:100px">5</view>
-				<view class="bg-black" style="height:100px">6</view>
-				<view class="bg-blue" style="height:100px">7</view>
-				<view class="bg-black" style="height:100px">8</view>
-				<view class="bg-blue" style="height:100px">9</view>
-				<view class="bg-black" style="height:100px">10</view>
+			<scroll-view scroll-y="{{scrollViewScorll}}" scroll-top="0" style="height: 100%;">
+				<view class="cu-card dynamic no-card solid-bottom" wx:for="{{dynamicList}}" wx:key='key' bindtap="bindNavDynamicDetail" data-dynamic-id="{{item.dynamicId}}">
+					<view class="cu-item shadow">
+						<!-- 头像、昵称、时间区 -->
+						<view class="cu-list menu-avatar">
+							<view class="cu-item" style="height: 130rpx;padding-top: 20rpx;">
+								<view class="cu-avatar round lg" style="background-image:url({{item.senderAvatar}});"></view>
+								<view class="content">
+									<view class="text-cut">{{item.senderNickName}}</view>
+									<view class="text-gray text-sm flex justify-between">
+										{{item.sendTime}}
+									</view>
+								</view>
+								<view class="action cuIcon-close" style="font-size:1.6em" bindtap="bindDeleteDynamic" data-dynamic-id="{{item.dynamicId}}"></view>
+							</view>
+						</view>
+
+						<!-- 文字区 -->
+						<view class="text-content" style="padding-left:146rpx;">
+							{{item.content}}
+						</view>
+
+						<!-- 图片区 -->
+						<view class="grid flex-sub padding-lr col-3 grid-square" style="padding-left:146rpx">
+							<view class="bg-img" style="background-image:url({{img}});" wx:for="{{item.images}}" wx:key="key" wx:for-item="img">
+							</view>
+						</view>
+
+						<!-- 音频区 -->
+						<view class="cu-list menu-avatar" style="padding-left: 146rpx;padding-right: 30rpx;">
+							<view class="cu-item" style="background-color: #f8f8f8;border-radius: 10px;padding: 0;margin-top: 20rpx;height:150rpx">
+								<view class="cu-avatar radius lg text-bold" style="background-image:url({{item.song.cover}});width:150rpx;height:150rpx;font-size: 3em;left:0;" catchtap="catchPlayAudio" data-song-id="{{item.song.id}}">
+									<text class="cuIcon-{{playingSongId== item.song.id ? 'stop':'playfill'}}" style="opacity:0.5;"></text>
+								</view>
+								<view class="content with{{item.song.needChorus?'':'out'}}-chorus" style="left:170rpx;line-height:2em;">
+									<view class="text-lg text-black text-bold">
+										<text class="text-cut">{{item.song.name}}</text>
+										<text class="text-orange margin-lr-xs">{{item.song.score}}</text>
+									</view>
+									<view class="text-gray text-df flex">
+										<text class="cuIcon-all"></text>
+										<text class="margin-lr-xs">{{item.song.listenNum}}</text>
+									</view>
+								</view>
+								<view class="action" wx:if="{{item.song.needChorus}}" style="width:120rpx">
+									<view class="text-center text-black text-bold" style="height: 90rpx;font-size: 16px;line-height: 90rpx;border-left: 1px solid #dedede;" catchtap="catchChorus" data-song-id="{{item.song.id}}">合唱</view>
+								</view>
+							</view>
+						</view>
+
+						<!-- 分享,点赞,评论 -->
+						<view class="text-black flex aligin-center justify-between" style="font-size: 46rpx;padding:22rpx 30rpx 22rpx 146rpx">
+							<view class="flex align-center" catchtap="catchShare" data-song-id="{{item.song.id}}">
+								<text class="cuIcon-share margin-lr-xs"></text>
+								<text style="font-size:30rpx">分享</text>
+							</view>
+							<view class="flex align-center" catchtap="catchComments" data-dynamic-id="{{item.dynamicId}}">
+								<text class="cuIcon-message margin-lr-xs"></text>
+								<text style="font-size:30rpx">{{item.commentsNum}}</text>
+							</view>
+							<view class="flex align-center" catchtap="catchUp" data-dynamic-id="{{item.dynamicId}}">
+								<text class="cuIcon-appreciate margin-lr-xs"></text>
+								<text style="font-size:30rpx">{{item.upNum}}</text>
+							</view>
+						</view>
+					</view>
+				</view>
 			</scroll-view>
 		</swiper-item>
 
 		<!-- 作品 -->
 		<swiper-item class='bg-white'>
-			<scroll-view scroll-y="{{scrollViewScorll}}" scroll-top="0" style="height: 100%;">
+			<scroll-view scroll-y="{{scrollViewScorll}}" style="height: 100%;">
 				<view class="bg-blue" style="height:100px">Tab1</view>
 				<view class="bg-black" style="height:100px">2</view>
 				<view class="bg-blue" style="height:100px">3</view>
@@ -129,7 +186,7 @@
 
 		<!-- 合唱 -->
 		<swiper-item class='bg-white'>
-			<scroll-view scroll-y="{{scrollViewScorll}}" scroll-top="0" style="height: 100%;">
+			<scroll-view scroll-y="{{scrollViewScorll}}" style="height: 100%;">
 				<view class="bg-blue" style="height:100px">Tab3</view>
 				<view class="bg-black" style="height:100px">2</view>
 			</scroll-view>
