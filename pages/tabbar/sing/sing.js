@@ -198,6 +198,11 @@ Page({
     console.log(e.currentTarget.dataset.song);
     // TODO:跳转至唱歌界面
   },
+  bindNavSong:function(e){
+    wx.navigateTo({
+      url: '../../detail/song/song',
+    })
+  },
   // 原来实现的吸顶方法，废弃，太卡顿了
   // bindscroll: function (e) {
   //   // 巧妙实现吸顶效果,棒棒哒

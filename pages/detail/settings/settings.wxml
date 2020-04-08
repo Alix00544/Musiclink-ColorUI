@@ -5,6 +5,15 @@
 </cu-custom>
 
 <view class="cu-list menu sm-border">
+	<view class="cu-item arrow">
+		<view class="content">
+			<text class="cuIcon-edit text-cyan"></text>
+			<text class="text-black">昵称</text>
+		</view>
+		<view class="action">
+			<text class="text-black text-xl">Alix1997</text>
+		</view>
+	</view>
 
 	<view class="cu-item arrow">
 		<view class="content">
@@ -17,13 +26,11 @@
 	</view>
 	<view class="cu-item arrow">
 		<view class="content">
-			<text class="cuIcon-edit text-cyan"></text>
-			<text class="text-black">昵称</text>
-		</view>
-		<view class="action">
-			<text class="text-black text-xl">Alix1997</text>
+			<text class="cuIcon-picfill text-blue"></text>
+			<text class="text-black">背景图片</text>
 		</view>
 	</view>
+
 	<view class="cu-item arrow">
 		<view class="content">
 			<text class="cuIcon-male text-green"></text>
@@ -31,13 +38,6 @@
 		</view>
 		<view class="action">
 			<switch class="switch-sex sm" bindchange="switchSex"></switch>
-		</view>
-	</view>
-
-	<view class="cu-item arrow">
-		<view class="content">
-			<text class="cuIcon-picfill text-blue"></text>
-			<text class="text-black">背景图片</text>
 		</view>
 	</view>
 
@@ -72,7 +72,7 @@
 			<text class="cuIcon-discoverfill text-orange"></text>
 			<text class="text-black">关于连音符</text>
 		</view>
-    		<view class="action">
+		<view class="action">
 			<view class="cu-tag round bg-orange light">音乐</view>
 			<view class="cu-tag round bg-olive light">合唱</view>
 		</view>

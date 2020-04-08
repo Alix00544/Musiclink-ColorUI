@@ -1,2 +1,103 @@
-<!--pages/detail/sendDynamic/sendDynamic.wxml-->
-<text>pages/detail/sendDynamic/sendDynamic.wxml</text>
+<cu-custom bgColor="bg-white" isBack="{{true}}">
+	<view slot="content">分享动态</view>
+</cu-custom>
+
+<!-- 内容输入 -->
+<view class="cu-form-group padding">
+	<textarea style="font-size:35rpx" maxlength="{{textareaMaxNum}}" bindinput="textareaInput" placeholder="分享你此刻的想法或心情~"></textarea>
+</view>
+
+<!-- 上传图片 -->
+<view class="cu-bar bg-white margin-top">
+	<view class="action">配图上传</view>
+	<view class="action">
+		{{imgList.length}}/{{imgMaxNum}}
+	</view>
+</view>
+<view class="cu-form-group">
+	<view class="grid col-4 grid-square flex-sub my-border-bottom">
+		<view class="bg-img" wx:for="{{imgList}}" wx:key="key" bindtap="ViewImage" data-url="{{imgList[index]}}">
+			<image src='{{imgList[index]}}' mode='aspectFill'></image>
+			<view class="cu-tag bg-red" catchtap="DelImg" data-index="{{index}}">
+				<text class="cuIcon-close"></text>
+			</view>
+		</view>
+		<view class="solids" bindtap="ChooseImage" wx:if="{{imgList.length<imgMaxNum}}">
+			<text class="cuIcon-cameraadd"></text>
+		</view>
+	</view>
+</view>
+<!-- 音频 -->
+<view class="cu-bar bg-white">
+	<view class="action">选择作品</view>
+</view>
+<view class="cu-form-group" wx:if="{{!curSong}}">
+	<view class="grid col-4 grid-square flex-sub">
+		<view class="solids" bindtap="bindShowChoose">
+			<text class="cuIcon-add"></text>
+		</view>
+	</view>
+</view>
+<view class="cu-list menu-avatar" wx:if="{{curSong}}">
+	<view class="cu-item" style="height:170rpx">
+		<view class="cu-avatar radius lg shadow-blur" style="background-image:url({{curSong.coverImg}});width:150rpx;height:150rpx;opacity:0.8;font-size: 3em;">1</view>
+		<view class="content" style="width:calc(100% - 150rpx - 60rpx - 200rpx - 20rpx);left:200rpx;line-height:2em;">
+			<text class="text-cut text-lg">{{curSong.name}}</text>
+			<view class="text-gray text-sm flex">
+				<text class="text-cut">{{curSong.singer}}</text>
+			</view>
+		</view>
+		<view class="action" style="width:200rpx" bindtap="bindSing" data-song="{{curSong.name}}">
+			<button class="cu-btn line-grey round text-center" style="width:120rpx;height:60rpx;font-size:26rpx;font-weight:normal;" bindtap="bindShowChoose">更换</button>
+		</view>
+	</view>
+</view>
+<!-- 发布 -->
+<view class="cu-bar btn-group padding">
+	<button class="cu-btn bg-green shadow-blur round lg" bindtap="bindSend">发布</button>
+</view>
+
+
+<!-- 底部评论弹窗 -->
+<view class="cu-modal bottom-modal {{showChoose?'show':''}}" bindtap="bindHideChoose">
+	<view class="cu-dialog" style="height:60%;border-radius:2% 2% 0 0;" catchtap>
+		<view class="cu-bar bg-white">
+			<view class="action text-black">我的作品</view>
+			<view class="action text-blue" bindtap="bindHideChoose">隐藏</view>
+		</view>
+		<scroll-view scroll-y class="bg-white" style="height:100%">
+			<view class="cu-list menu-avatar">
+				<view class="cu-item" style="height:170rpx" wx:for="{{mySongs}}" wx:key="key" wx:for-item="song">
+					<view class="cu-avatar radius lg shadow-blur" style="background-image:url({{song.coverImg}});width:150rpx;height:150rpx;opacity:0.8;font-size: 3em;">{{index+1}}</view>
+					<view class="content" style="width:calc(100% - 150rpx - 60rpx - 200rpx - 20rpx);left:200rpx;line-height:2em;">
+						<view class="text-cut text-lg">{{song.name}}</view>
+						<view class="text-gray text-sm flex">
+							<text class="text-cut">{{song.singer}}</text>
+						</view>
+					</view>
+					<view class="action" style="width:200rpx" bindtap="bindSing" data-song="{{song.name}}">
+						<button class="cu-btn line-red round text-center" style="width:120rpx;height:60rpx;font-size:26rpx;font-weight:normal;">选择</button>
+					</view>
+				</view>
+			</view>
+      <!-- 垫子 -->
+			<view class="cu-bar bg-white"></view>
+		</scroll-view>
+
+	</view>
+</view>
+
+
+
+<!-- <view class="cu-item" style="height:170rpx" wx:for="{{item.songlist}}" wx:key="key" wx:for-item="song" bindtap="bindNavSong">
+			<view class="cu-avatar radius lg shadow-blur" style="background-image:url({{song.coverImg}});width:150rpx;height:150rpx;opacity:0.8;font-size: 3em;">{{index+1}}</view>
+			<view class="content" style="width:calc(100% - 150rpx - 60rpx - 200rpx - 20rpx);left:200rpx;line-height:2em;">
+				<text class="text-cut text-lg">{{song.name}}</text>
+				<view class="text-gray text-sm flex">
+					<text class="text-cut">{{song.singer}}</text>
+				</view>
+			</view>
+			<view class="action" style="width:200rpx" bindtap="bindSing" data-song="{{song.name}}">
+				<button class="cu-btn line-red round text-center" style="width:120rpx;height:60rpx;font-size:26rpx;font-weight:normal;">演唱</button>
+			</view>
+		</view> -->

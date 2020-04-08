@@ -1,2 +1,42 @@
-<!--pages/detail/song/song.wxml-->
-<text>pages/detail/song/song.wxml</text>
+<cu-custom bgColor="bg-white" isCustom="{{true}}">
+</cu-custom>
+<view class="cu-list menu-avatar">
+	<view class="cu-item" style="height: 200rpx;">
+		<view class="cu-avatar radius xl" style="background-image:url(https://test-1301509754.file.myqcloud.com/光年之外/cover.jpg);"></view>
+		<view class="content my-content">
+			<view>
+				<text class="text-cut">光年之外</text>
+				<view class="cu-tag round bg-orange sm">评分</view>
+			</view>
+			<view class="text-gray text-sm flex">
+				<text class="text-cut">邓紫棋</text>
+			</view>
+		</view>
+	</view>
+</view>
+
+<view class="bg-white">
+	<view class="flex  p-xs margin-bottom-sm mb-sm text-center">
+		<view class="flex-sub padding-sm margin-xs radius">独唱</view>
+		<view class="flex-twice bg-red padding-sm margin-xs round">我要演唱</view>
+		<view class="flex-sub padding-sm margin-xs radius">合唱</view>
+	</view>
+</view>
+
+<view class="cu-bar bg-white solid-bottom margin-top">
+	<view class="action">
+		<text class="cuIcon-titles text-orange "></text>全国排行
+	</view>
+</view>
+<view class="cu-list menu-avatar">
+	<view class="cu-item" style="height:100rpx;" wx:for="{{30}}">
+		<view class="text-center text-gray text-cut" style="position:absolute;left:30rpx;width:40rpx;">{{index+1}}</view>
+		<view class="cu-avatar round" style="background-image:url(https://ossweb-img.qq.com/images/lol/web201310/skin/big10001.jpg);left:90rpx"></view>
+		<view class="content" style="left:174rpx">
+			<view class="text-grey text-cut">凯尔</view>
+		</view>
+		<view class="action">
+			<view class="text-grey text-xs">新上榜</view>
+		</view>
+	</view>
+</view>

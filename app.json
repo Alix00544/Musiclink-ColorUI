@@ -9,10 +9,13 @@
     "pages/detail/dynamicDetail/dynamicDetail",
     "pages/detail/song/song",
     "pages/detail/singer/singer",
-    "pages/detail/settings/settings"
+    "pages/detail/settings/settings",
+    "pages/detail/singMode/singMode",
+    "pages/detail/sing/sing"
   ],
   "window": {
-    "navigationStyle": "custom"
+    "navigationStyle": "custom",
+    "navigationBarTextStyle": "black"
   },
   "tabBar": {
     "color": "#7A7E83",

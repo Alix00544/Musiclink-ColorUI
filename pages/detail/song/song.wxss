@@ -1,1 +1,11 @@
-/* pages/detail/song/song.wxss */
+/* 重写 修改头像宽高 */
+.cu-avatar.xl {
+  width: 150rpx;
+  height: 150rpx;
+  font-size: 2.5em;
+}
+.my-content {
+  left: 200rpx !important;
+  width: calc(100% - 150rpx - 60rpx - 20rpx) !important;
+}
+  

@@ -96,6 +96,20 @@
 					"id": -1,
 					"name": "pages/detail/settings/settings",
 					"pathName": "pages/detail/settings/settings",
+					"query": "",
+					"scene": null
+				},
+				{
+					"id": -1,
+					"name": "pages/detail/song/song",
+					"pathName": "pages/detail/song/song",
+					"query": "",
+					"scene": null
+				},
+				{
+					"id": -1,
+					"name": "pages/detail/sendDynamic/sendDynamic",
+					"pathName": "pages/detail/sendDynamic/sendDynamic",
 					"scene": null
 				}
 			]
