@@ -110,6 +110,13 @@
 					"id": -1,
 					"name": "pages/detail/sendDynamic/sendDynamic",
 					"pathName": "pages/detail/sendDynamic/sendDynamic",
+					"query": "",
+					"scene": null
+				},
+				{
+					"id": -1,
+					"name": "pages/detail/singMode/singMode",
+					"pathName": "pages/detail/singMode/singMode",
 					"scene": null
 				}
 			]

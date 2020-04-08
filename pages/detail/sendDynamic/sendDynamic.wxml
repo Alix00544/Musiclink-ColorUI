@@ -1,6 +1,13 @@
-<cu-custom bgColor="bg-white" isBack="{{true}}">
-	<view slot="content">分享动态</view>
-</cu-custom>
+<view class="cu-custom text-white" style="height:{{CustomBar}}px">
+	<view class="cu-bar fixed" style="height:{{CustomBar}}px;padding-top:{{StatusBar}}px;">
+		<view class="action" bindtap="BackPage">
+			<text class="cuIcon-back"></text>
+		</view>
+		<view class="content" style="top:{{StatusBar}}px">
+			<view class="text-cut text-white text-bold">分享动态</view>
+		</view>
+	</view>
+</view>
 
 <!-- 内容输入 -->
 <view class="cu-form-group padding">

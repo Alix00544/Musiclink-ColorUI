@@ -1,10 +1,12 @@
-// pages/detail/sendDynamic/sendDynamic.js
+const app = getApp();
 Page({
 
   /**
    * 页面的初始数据
    */
-  data: {
+  data: {    
+    StatusBar: app.globalData.StatusBar,
+    CustomBar: app.globalData.CustomBar,
     imgList: [],
     imgMaxNum: 9,
     textareaValue: '',
@@ -45,6 +47,27 @@ Page({
    */
   onShow: function () {
 
+  },
+  BackPage:function(e){
+    if(this.data.imgList.length>0 || this.data.textareaValue.length>0){
+      wx.showModal({
+        title: '离开动态发布？',
+        content: '离开当前页面后，动态内容不会被保存',
+        cancelText: '取消',
+        confirmText: '确定',
+        success: res => {
+          if (res.confirm) {
+            wx.navigateBack({
+              delta: 1
+            });
+          }
+        }
+      })
+    }else{
+      wx.navigateBack({
+        delta: 1
+      });
+    }
   },
   ChooseSong: function (e) {
 

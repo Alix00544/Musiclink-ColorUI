@@ -1,1 +1,32 @@
 /* pages/detail/singMode/singMode.wxss */
+
+.my-bg {
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  height: 100%;
+  background-size: 100% 100%;
+  transform: scale(1.1);
+  /* 放大1.2倍去除白边*/
+  z-index: -1;
+}
+
+.cu-form-group .title{
+  text-align: center;
+  padding:0;
+  width:100%;
+  height: 100%;
+}
+
+
+/*  重写 checkbox 样式  */
+/* 未选中的 背景样式 */
+checkbox .wx-checkbox-input {
+  background: transparent;
+}
+checkbox[checked] .wx-checkbox-input{
+	/* background-color: var(--green) !important; */
+	color: var(--white) !important;
+}

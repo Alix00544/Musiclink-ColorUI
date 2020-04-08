@@ -143,7 +143,7 @@ image.loading::after {
  ==================== */
 
 switch,
-checkbox,
+/* checkbox, */
 radio {
 	position: relative;
 }
@@ -190,8 +190,8 @@ switch[checked]::before {
 	transform: scale(0, 0);
 }
 
-radio::before,
-checkbox::before {
+/* checkbox::before, */
+radio::before {
 	font-family: "cuIcon";
 	content: "\e645";
 	position: absolute;
@@ -207,8 +207,8 @@ checkbox::before {
 	z-index: 9;
 }
 
-radio .wx-radio-input,
-checkbox .wx-checkbox-input {
+/* checkbox .wx-checkbox-input, */
+radio .wx-radio-input{
 	margin: 0;
 	width: 24px;
 	height: 24px;
@@ -265,7 +265,7 @@ switch.radius .wx-switch-input::before {
 
 switch .wx-switch-input::before,
 radio.radio::before,
-checkbox .wx-checkbox-input::before,
+/* checkbox .wx-checkbox-input::before, */
 radio .wx-radio-input::before,
 radio.radio::before {
 	display: none;
@@ -332,7 +332,7 @@ radio.olive[checked] .wx-radio-input {
 
 switch.green[checked] .wx-switch-input,
 checkbox.green[checked] .wx-checkbox-input,
-checkbox[checked] .wx-checkbox-input,
+/* checkbox[checked] .wx-checkbox-input, */
 radio.green[checked] .wx-radio-input {
 	border-color: var(--green) !important;
 }
@@ -428,7 +428,7 @@ radio.olive[checked] .wx-radio-input {
 switch.green[checked] .wx-switch-input,
 switch[checked] .wx-switch-input,
 checkbox.green[checked] .wx-checkbox-input,
-checkbox[checked] .wx-checkbox-input,
+/* checkbox[checked] .wx-checkbox-input, */
 radio.green[checked] .wx-radio-input,
 radio[checked] .wx-radio-input {
 	background-color: var(--green) !important;

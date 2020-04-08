@@ -12,7 +12,14 @@ Page({
    * 生命周期函数--监听页面加载
    */
   onLoad: function (options) {
-
+    var selectList=[];
+    if(options.mode == 1){
+      selectList = options.selectList.split(',');
+    }
+    this.setData({
+      mode:options.mode,
+      selectList:selectList
+    })
   },
 
   /**
