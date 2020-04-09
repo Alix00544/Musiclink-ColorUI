@@ -51,15 +51,15 @@ function getShowTime(recordTime) {
     var minC = diff / minute;
     if (weekR > 1) {
       return recordTime.format('yyyy-MM-dd');
-    }else if (dayC == 1 || (hourC < 24 && recordTime.getDate() != now.getDate())) {
+    } else if (dayC == 1 || (hourC < 24 && recordTime.getDate() != now.getDate())) {
       return '昨天' + recordTime.format("hh:mm");
-    }else if (dayC > 1) {
+    } else if (dayC > 1) {
       return recordTime.format('MM-dd');
-    }else if (hourC >= 1) {
+    } else if (hourC >= 1) {
       return "大约" + parseInt(hourC) + '小时前';
-    }else if (minC >= 1) {
+    } else if (minC >= 1) {
       return "大约" + parseInt(minC) + '分钟前';
-    }else {
+    } else {
       return '刚刚';
     }
   }
@@ -71,6 +71,12 @@ function getShowTime(recordTime) {
 **method 是你的请求方式，分为GET/POST,默认GET
 **data 是你要请求的数据
 */
+//这里是请求格式的模板
+// util.requestFromServer(servelet, data).then((res) => {
+//   that.processRequestData(res.data, settedKey, categoryTitle);
+// }).catch((err) => {
+//   console.log("请求失败");
+// })
 const requestFromServer = (servelet, data, method = "GET") => {
 
   return new Promise((Resolve, Reject) => {
@@ -93,14 +99,31 @@ const requestFromServer = (servelet, data, method = "GET") => {
   });
 }
 
-//这里是请求格式的模板
-// util.requestFromServer(servelet, data).then((res) => {
-//   that.processRequestData(res.data, settedKey, categoryTitle);
-// }).catch((err) => {
-//   console.log("请求失败");
-// })
+// 防抖 在delay时间周期内，若有多次事件触发，只执行最后一次事件；
+function debounce(handle, delay) {
+  var timer = null;
+  return function (e) {
+    var _self = this;
+    clearTimeout(timer);
+    timer = setTimeout(function () {
+      handle.call(_self, e);
+    }, delay);
+  }
+}
+
+// 将秒转换为分钟 例如156s ->02:36
+function getFormatMinTime(second = 0) {
+  if (second < 0) { return -1 }
+  var min = Math.floor(second / 60).toString();
+  var sec = Math.floor(second - min * 60).toString();
+  min = min.length == 1 ? '0' + min : min;
+  sec = sec.length == 1 ? '0' + sec : sec;
+  return `${min}:${sec}`;
+}
 
 module.exports = {
   requestFromServer: requestFromServer,
-  getShowTime:getShowTime
+  getShowTime: getShowTime,
+  debounce: debounce,
+  getFormatMinTime:getFormatMinTime
 }

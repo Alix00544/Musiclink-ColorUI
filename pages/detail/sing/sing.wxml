@@ -1,2 +1,76 @@
-<!--pages/detail/sing/sing.wxml-->
-<text>pages/detail/sing/sing.wxml</text>
+<!-- 自定义顶部栏 -->
+<cu-custom bgColor="text-white" isBack="{{true}}">
+	<view slot="content">
+		<text class="text-white text-bold">{{song.title}}</text>
+	</view>
+</cu-custom>
+
+<!-- 背景图片 -->
+<image class="my-bg" style="background-image:url('https://pic3.zhimg.com/80/v2-a788f80c7bab3ef36e86ddaf60d0b6f8_720w.jpg');filter:blur(3px) brightness(0.7);"></image>
+
+<!-- 头像栏 总高140rpx -->
+<view class="flex text-center align-center padding-sm">
+	<view class="flex-sub">
+		<view class="cu-avatar lg round margin-left my{{selectObj[curLyrics]?'-cur':''}}-avatar" style="background-image:url(https://ossweb-img.qq.com/images/lol/web201310/skin/big81005.jpg);"></view>
+	</view>
+	<view class="flex-sub">
+		<view class="cu-avatar lg round margin-left my{{!selectObj[curLyrics]?'-cur':''}}-avatar cuIcon-people bg-grey"></view>
+	</view>
+</view>
+
+<!-- 录制呼吸灯、时间 + 提示 高度:100rpx -->
+<view class="flex flex-direction">
+	<view class="flex-sub text-left text-white padding-lr flex align-center">
+		<view class="my{{isRecord?'-breathe':''}}-circle margin-lr-sm"></view>
+		<text style="height:40rpx;">{{isRecord?'录制':'暂停'}}</text>
+		<text class="margin-lr-sm">{{curShowTime}}</text>/
+		<text class="margin-lr-sm">{{allShowTime}}</text>
+	</view>
+	<view class="flex-sub text-center padding-sm">
+		<view class="text-center flex justify-center" wx:if="{{showWait && curLyrics==curShowLyrics}}">
+			<view class="third-dot margin-lr-sm"></view>
+			<view class="second-dot margin-lr-sm"></view>
+			<view class="first-dot margin-lr-sm"></view>
+		</view>
+		<view wx:if="{{!showWait}}" style="padding:10rpx"></view>
+	</view>
+</view>
+<!-- 划线取词 -->
+	<view class="my-line" wx:if="{{isScroll}}">
+		<view class="my-left-dot"></view>
+		<view class="my-center-line"></view>
+		<view class="my-right-dot"></view>
+	</view>
+<!-- 歌词栏 -->
+<scroll-view scroll-y style='height:{{ScreenHeight - CustomBar - (140+100+180) * rpxTopx}}px;position:relative' scroll-with-animation="true" scroll-into-view="{{'lyrics'+curLyrics}}" bindscroll="bindScroll">
+	<view id="lyrics{{index}}" class="cu-form-group text-white justify-end" style="background-color:transparent;border:0;min-height: 80rpx" wx:for="{{lyrics}}" wx:key='key'>
+		<!-- 用户头像 mode==1 时显示-->
+		<view wx:if="{{selectObj[index]}}" class="cu-avatar sm round" style="background-image:url(https://ossweb-img.qq.com/images/lol/web201310/skin/big10001.jpg);"></view>
+		<!-- 歌词 -->
+		<view class="title text-cut {{index==curShowLyrics?'text-red text-bold my-text-lg':''}}" style="padding:0 60rpx 0 12rpx;width: calc(100% - 48rpx);">{{item.lyrics}}</view>
+	</view>
+</scroll-view>
+
+
+<!-- 操作栏 180rpx -->
+<view class="flex text-center text-white padding" style="position:fixed;width:100%;bottom:0">
+	<view class="flex-sub flex-direction my-height {{isOffvocal?'':'text-red'}}" bindtap="bindChangeVocal">
+		<view class="cuIcon-music{{isOffvocal?'forbid':''}}fill my-icon"></view>
+		<view class="my-text">原唱</view>
+	</view>
+	<view class="flex-sub flex-direction my-height">
+		<view class="cuIcon-rankfill my-icon"></view>
+		<view class="my-text">调音</view>
+	</view>
+	<view class="flex-twice my-height" bindtap="bindChangeRecord">
+		<view class="cuIcon-{{isRecord?'stop':'voicefill'}}" style="font-size:100rpx"></view>
+	</view>
+	<view class="flex-sub flex-direction my-height" bindtap="bindRestart">
+		<view class="cuIcon-refresh my-icon"></view>
+		<view class="my-text">重唱</view>
+	</view>
+	<view class="flex-sub flex-direction my-height" bindtap="bindFinish">
+		<view class="cuIcon-roundcheck my-icon"></view>
+		<view class="my-text">完成</view>
+	</view>
+</view>
