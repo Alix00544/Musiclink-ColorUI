@@ -124,7 +124,7 @@
 					"id": 9,
 					"name": "pages/detail/sing/sing",
 					"pathName": "pages/detail/sing/sing",
-					"query": "mode=1&selectList=4,5,6,11,12,13",
+					"query": "mode=2&selectList=4,5,6,11,12,13",
 					"scene": null
 				}
 			]

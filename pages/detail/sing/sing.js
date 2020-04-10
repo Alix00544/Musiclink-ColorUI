@@ -2,6 +2,8 @@ const app = getApp();
 const util = require('../../../utils/util');
 const offvocalAudio = wx.createInnerAudioContext();
 const sourceAudio = wx.createInnerAudioContext();
+const recorderManager = wx.getRecorderManager();
+
 Page({
   data: {
     CustomBar: app.globalData.CustomBar,
@@ -19,7 +21,6 @@ Page({
     allShowTime: '00:00', // 歌曲整体展示时间
     seekList: [], // 用户歌词跳转操作记录
     isSeek: false,
-    firstIn: true,
     song: {
       "artist": "周杰伦",
       "title": "告白气球",
@@ -49,7 +50,7 @@ Page({
       }
     }
     this.setData({
-      mode: options.mode,
+      mode: options.mode,   // mode-0表示独唱，mode-1表示合唱
       selectList: selectList,
       selectObj: selectObj,
       lyrics: lyrics,
@@ -86,7 +87,6 @@ Page({
 
   },
   playAudio: function () {
-    var allShowTime;
     var that = this;
 
     offvocalAudio.src = this.data.savedOffvocalFilePath;
@@ -96,7 +96,7 @@ Page({
     offvocalAudio.onTimeUpdate((res) => {
       var curMsTime = offvocalAudio.currentTime * 1000;
       var lyrics = that.data.lyrics;
-      var curLyrics = lyrics.length - 1; // 下面循环中没有结果，就是最后一句
+      var curLyrics = 0;
       if (that.data.allShowTime == '00:00') {
         that.setData({
           allShowTime: util.getFormatMinTime(offvocalAudio.duration)
@@ -110,7 +110,13 @@ Page({
         })
       } else {
         for (let i = 1; i < lyrics.length; i++) {
-          if (curMsTime <= lyrics[i].time) {
+          if (curMsTime < lyrics[0].time) {
+            curLyrics = 0;
+            break;
+          } else if (curMsTime >= lyrics[lyrics.length - 1].time) {
+            curLyrics = lyrics.length - 1;
+            break;
+          } else if (lyrics[i - 1].time <= curMsTime && curMsTime < lyrics[i].time) {
             curLyrics = i - 1;
             break;
           }
@@ -145,8 +151,48 @@ Page({
         })
       }
     })
+    offvocalAudio.onEnded(() => {
+      sourceAudio.stop();
+      recorderManager.stop();
+      that.setData({
+        isRecord: false,
+        showWait: false
+      })
+      // 跳转到试听界面 + 取消一系列监听事件
+    })
 
-    setTimeout(this.bindChangeRecord, 3000);
+    sourceAudio.onEnded(() => {
+      offvocalAudio.stop();
+      recorderManager.stop();
+      that.setData({
+        isRecord: false,
+        showWait: false
+      })
+      // 跳转到试听界面+ 取消一系列监听事件
+    })
+
+    // offvocalAudio.onSeeked(()=>{
+    //   offvocalAudio.play()
+    // })
+
+    setTimeout(function () {
+      offvocalAudio.play();
+      sourceAudio.play();
+      recorderManager.start({
+        format: 'mp3'
+      });
+      recorderManager.onStop((res) => {
+        console.log('recorder stop', res)
+        const { tempFilePath } = res
+        that.setData({
+          recorderPath: tempFilePath
+        })
+      })
+      that.setData({
+        isRecord: true
+      })
+    }, 3000);
+
     this.setData({
       showWait: true
     })
@@ -154,41 +200,41 @@ Page({
   // 滑动取词
   bindScroll: function (e) {
     // 每句歌词80rpx
-    console.log('bindScroll', e.detail.scrollTop)
-    var curShowLyrics = Math.ceil((e.detail.scrollTop + 10 * this.data.rpxTopx) / (80 * this.data.rpxTopx)) - 1;
-    this.setData({
-      curShowLyrics: curShowLyrics <= 0 ? 0 : curShowLyrics,
-      // showWait: false,
-      // isScroll: true
-    })
-    // this.setCurLyrics(curShowLyrics);
+    // var curShowLyrics = Math.ceil((e.detail.scrollTop + 10 * this.data.rpxTopx) / (80 * this.data.rpxTopx)) - 1;
+    if (this.data.isScroll) {
+      // var curShowLyrics = Math.ceil((e.detail.scrollTop + 10 * this.data.rpxTopx) / (80 * this.data.rpxTopx)) - 1;
+      var curShowLyrics = Math.ceil((e.detail.scrollTop + 5) / 40) - 1;
+      console.log('bindScroll', e.detail.scrollTop, curShowLyrics)
+      if (curShowLyrics != this.data.curShowLyrics) {
+        this.setData({
+          curShowLyrics: curShowLyrics <= 0 ? 0 : curShowLyrics,
+        })
+      }
+    }
   },
-  // 防抖设置，delay时间内多次触发，只执行最后一次
-  setCurLyrics: util.debounce(function (curShowLyrics) {
-    // TODO记录时间节点,修改播放音频位置
-    // console.log(11111);
-    // var seekTime = this.data.lyrics[curShowLyrics].time/1000;
-    // offvocalAudio.seek(seekTime);
-    // sourceAudio.seek(seekTime);
-    // var seekList = this.data.seekList;
-    // console.log('seekList',seekList.push(seekTime))
-    // this.setData({
-    // curLyrics: curShowLyrics,
-    // isScroll: false,
-    // seekList:seekList
-    // })
-  }, 200),
+  bindtouchstart: function (e) {
+    this.setData({
+      isScroll: true,
+      showWait: false
+    })
+  },
   touchEnd: function (e) {
+    // clearTimeout(seekTimer);
+    // 滑动取词结束，设置3秒延迟
     console.log('touchEnd');
     var curShowLyrics = this.data.curShowLyrics;
     var seekTime = this.data.lyrics[curShowLyrics].time / 1000;
     // offvocalAudio.pause();
     // sourceAudio.pause();
-    offvocalAudio.seek(seekTime - 3 > 0 ? seekTime - 3 : 0);
-    sourceAudio.seek(seekTime - 3 > 0 ? seekTime - 3 : 0);
+    seekTime = seekTime - 3 > 0 ? seekTime - 3 : 0;
+    offvocalAudio.seek(seekTime);
+    sourceAudio.seek(seekTime);
     // offvocalAudio.play();
     // sourceAudio.play();
-    this.data.seekList.push(seekTime - 3 > 0 ? seekTime - 3 : 0);
+    this.data.seekList.push({ 
+      seekTime: seekTime, 
+      recorderTime: recorderManager.duration 
+    });
 
     // offvocalAudio.seek(seekTime);
     // sourceAudio.seek(seekTime);
@@ -208,13 +254,7 @@ Page({
       })
     }, 3000);
   },
-  bindtouchstart: function (e) {
-    this.setData({
-      isScroll: true,
-      showWait: false
-    })
-    console.log('bindtouchstart')
-  },
+
   // 切换原唱、伴奏
   bindChangeVocal: function (e) {
     if (this.data.isOffvocal) {
@@ -230,25 +270,95 @@ Page({
   },
   // 暂停/开始按钮
   bindChangeRecord: function (e) {
-    console.log('bindChangeRecord')
     if (this.data.isRecord) {
       offvocalAudio.pause();
       sourceAudio.pause();
+      recorderManager.pause();
     } else {
       offvocalAudio.play();
       sourceAudio.play();
-      console.log('bindChangeRecord play')
+      recorderManager.resume();
     }
     this.setData({
-      isRecord: !this.data.isRecord
+      isRecord: !this.data.isRecord,
+      showWait: false
     })
   },
   // 重唱按钮
   bindRestart: function (e) {
+    var that = this;
+    sourceAudio.pause();
+    offvocalAudio.pause();
+    sourceAudio.seek(0);
+    offvocalAudio.seek(0);
 
+    // stop之后，重唱，原唱可能会play失败
+    // sourceAudio.stop();
+    // offvocalAudio.stop();
+    recorderManager.stop();
+    // 先置为false，再置为true,点点点动画就能播放....不然有可能失效
+    this.setData({
+      showWait: false
+    })
+    this.setData({
+      curShowTime: "00:00",
+      curTime: 0,
+      curLyrics: 0,
+      curShowLyrics: 0,
+      showWait: true,
+      isRecord: false,
+      isOffvocal: true,
+      isScroll: false,
+      seekList: [],
+      isSeek: false,
+      recorderPath: null
+    })
+    setTimeout(function () {
+      sourceAudio.play();
+      offvocalAudio.play();
+      sourceAudio.volume = 0;
+      offvocalAudio.volume = 1;
+      // TODO 开始录音
+      recorderManager.start({
+        format: 'mp3'
+      });
+      that.setData({
+        isRecord: true
+      })
+    }, 3000);
   },
   // 完成按钮
   bindFinish: function (e) {
+    var that = this;
+    sourceAudio.pause();
+    offvocalAudio.pause();
+    recorderManager.pause();
+    this.setData({
+      isRecord: false
+    })
+    wx.showModal({
+      content: '是否完成录制？',
+      cancelText: '继续演唱',
+      confirmText: '确认结束',
+      success(res) {
+        if (res.confirm) {
+          sourceAudio.stop();
+          offvocalAudio.stop();
+          recorderManager.stop();
+          // 跳转试听页面
+          var textAudio = wx.createInnerAudioContext()
+          textAudio.src = that.data.recorderPath;
+          textAudio.play();
 
+        } else if (res.cancel) {
+          sourceAudio.play();
+          offvocalAudio.play();
+          recorderManager.resume();
+          that.setData({
+            isRecord: true
+          })
+        }
+      }
+    })
   }
 })

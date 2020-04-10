@@ -128,17 +128,18 @@
   height: 120rpx;
 }
 
-.my-text-lg{
-  font-size:50rpx !important;
+.my-text-lg {
+  font-size: 50rpx !important;
   line-height: 80rpx;
 }
 
 
 /* 取词线 */
-.my-line{
+.my-line {
   position: relative;
-  z-index:100;
+  z-index: 100;
 }
+
 .my-center-line {
   position: absolute;
   height: 40rpx;
@@ -163,4 +164,15 @@
   width: 20rpx;
   border-radius: 50%;
   background-color: red;
+}
+
+
+
+.cu-form-group {
+  padding: 0 30rpx;
+}
+
+.my-chorus-tittle {
+  padding:0 60rpx 0 12rpx !important;
+  width: calc(100% - 48rpx) !important;
 }

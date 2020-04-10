@@ -9,7 +9,7 @@
 <image class="my-bg" style="background-image:url('https://pic3.zhimg.com/80/v2-a788f80c7bab3ef36e86ddaf60d0b6f8_720w.jpg');filter:blur(3px) brightness(0.7);"></image>
 
 <!-- 头像栏 总高140rpx -->
-<view class="flex text-center align-center padding-sm">
+<view wx:if="{{mode == 1}}" class="flex text-center align-center padding-sm">
 	<view class="flex-sub">
 		<view class="cu-avatar lg round margin-left my{{selectObj[curLyrics]?'-cur':''}}-avatar" style="background-image:url(https://ossweb-img.qq.com/images/lol/web201310/skin/big81005.jpg);"></view>
 	</view>
@@ -17,6 +17,8 @@
 		<view class="cu-avatar lg round margin-left my{{!selectObj[curLyrics]?'-cur':''}}-avatar cuIcon-people bg-grey"></view>
 	</view>
 </view>
+
+<view wx:if="{{mode == 0}}" style="padding-top:70rpx;width:100%;"></view>
 
 <!-- 录制呼吸灯、时间 + 提示 高度:100rpx -->
 <view class="flex flex-direction">
@@ -42,12 +44,12 @@
 	<view class="my-right-dot"></view>
 </view>
 <!-- 歌词栏 -->
-<scroll-view scroll-y style='height:{{ScreenHeight - CustomBar - (140+100+180) * rpxTopx}}px;position:relative;' scroll-into-view="{{'lyrics'+curLyrics}}" bindscroll="bindScroll" bindtouchend="touchEnd" bindtouchstart="bindtouchstart">
-	<view id="lyrics{{index}}" class="cu-form-group text-white justify-end" style="background-color:transparent;border:0;min-height: 80rpx" wx:for="{{lyrics}}" wx:key='key'>
+<scroll-view scroll-y style='height:{{ScreenHeight - CustomBar - (140+100+180) * rpxTopx}}px;position:relative;' scroll-into-view="{{'lyrics'+curLyrics}}" bindscroll="bindScroll" bindtouchend="touchEnd" bindtouchstart="bindtouchstart" bindtouchmove="bindtouchmove">
+	<view id="lyrics{{index}}" class="cu-form-group text-white justify-end" style="background-color:transparent;border:0;min-height: 40px" wx:for="{{lyrics}}" wx:key='key'>
 		<!-- 用户头像 mode==1 时显示-->
 		<view wx:if="{{selectObj[index]}}" class="cu-avatar sm round" style="background-image:url(https://ossweb-img.qq.com/images/lol/web201310/skin/big10001.jpg);"></view>
 		<!-- 歌词 -->
-		<view class="title  {{index==curShowLyrics?'text-red text-bold my-text-lg':'text-cut'}}" style="padding:0 60rpx 0 12rpx;width: calc(100% - 48rpx);font-size:35rpx;line-height:80rpx">{{index}}{{item.lyrics}}</view>
+		<view class="title  {{index==curShowLyrics?'text-red text-bold my-text-lg':'text-cut'}} {{mode==0?'':'my-chorus-tittle'}} {{isScroll?'text-cut':''}}" style="font-size:35rpx;line-height:40px;">{{index}}{{item.lyrics}}</view>
 	</view>
 	<view style="padding-bottom:{{ScreenHeight - CustomBar - (140+100+180) * rpxTopx}}px;"></view>
 </scroll-view>
