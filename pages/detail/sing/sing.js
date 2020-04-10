@@ -10,14 +10,16 @@ Page({
     showWait: false, // 歌词倒计时是否显示
     curLyrics: 0,  // 当前应该唱的句子
     curShowLyrics: 0, // 当前展示的标红句子，该值在用户取词时会与curLyric不同
-    isScroll: false, //控制取词线是否出现
     isRecord: false, // 录音状态，控制呼吸灯
     isOffvocal: true, // 是否为伴奏，默认为伴奏，false为原唱
-    curTime: 0, // 当前音频时长
+    isScroll: false, // 判断是否再滚动
+    curTime: 0, // 当前音频播放时长
     allTime: 0, // 音频总体时长
     curShowTime: '00:00', // 当前展示时间
-    allShowTime: '03:35', // 歌曲整体展示时间
-    seekList:[], // 用户歌词跳转操作记录
+    allShowTime: '00:00', // 歌曲整体展示时间
+    seekList: [], // 用户歌词跳转操作记录
+    isSeek: false,
+    firstIn: true,
     song: {
       "artist": "周杰伦",
       "title": "告白气球",
@@ -39,7 +41,6 @@ Page({
     console.log(options)
     var selectList = [];
     var selectObj = {};
-    var allShowTime = '00:00';
     var lyrics = wx.getStorageSync('lyrics');
     if (options.mode == 1) {
       selectList = options.selectList.split(',');
@@ -47,30 +48,13 @@ Page({
         selectObj[selectList[key]] = true;
       }
     }
-    // var offvocalAudio = wx.createInnerAudioContext();
-    offvocalAudio.src = options.savedOffvocalFilePath;
-    allShowTime = util.getFormatMinTime(offvocalAudio.duration);
-    // var sourceAudio = wx.createInnerAudioContext();
-    sourceAudio.src = options.savedSourceFilePath;
-    sourceAudio.volume = 0;
-
-    offvocalAudio.onPlay((res)=>{
-      console.log(res);
-      // this.setData({
-      //   curTime:
-      // })
-    })
-
     this.setData({
       mode: options.mode,
       selectList: selectList,
       selectObj: selectObj,
       lyrics: lyrics,
-      allShowTime:allShowTime,
-      // offvocalAudio:offvocalAudio,
-      // sourceAudio:sourceAudio
-      // savedSourceFilePath:options.savedSourceFilePath,
-      // savedOffvocalFilePath:options.savedOffvocalFilePath
+      savedSourceFilePath: options.savedSourceFilePath,
+      savedOffvocalFilePath: options.savedOffvocalFilePath
     })
   },
 
@@ -85,7 +69,7 @@ Page({
    * 生命周期函数--监听页面显示
    */
   onShow: function () {
-
+    this.playAudio();
   },
 
   /**
@@ -101,37 +85,142 @@ Page({
   onUnload: function () {
 
   },
+  playAudio: function () {
+    var allShowTime;
+    var that = this;
+
+    offvocalAudio.src = this.data.savedOffvocalFilePath;
+    sourceAudio.src = this.data.savedSourceFilePath;
+    sourceAudio.volume = 0;
+
+    offvocalAudio.onTimeUpdate((res) => {
+      var curMsTime = offvocalAudio.currentTime * 1000;
+      var lyrics = that.data.lyrics;
+      var curLyrics = lyrics.length - 1; // 下面循环中没有结果，就是最后一句
+      if (that.data.allShowTime == '00:00') {
+        that.setData({
+          allShowTime: util.getFormatMinTime(offvocalAudio.duration)
+        })
+      }
+
+      if (this.data.isScroll) {
+        that.setData({
+          curTime: curMsTime / 1000,
+          curShowTime: util.getFormatMinTime(offvocalAudio.currentTime)
+        })
+      } else {
+        for (let i = 1; i < lyrics.length; i++) {
+          if (curMsTime <= lyrics[i].time) {
+            curLyrics = i - 1;
+            break;
+          }
+        }
+        if (that.data.isSeek) {
+          curLyrics = curLyrics == 0 ? 0 : curLyrics + 1;
+        }
+        that.setData({
+          curTime: curMsTime / 1000,
+          curShowTime: util.getFormatMinTime(offvocalAudio.currentTime),
+          curLyrics: curLyrics,
+          curShowLyrics: curLyrics
+        })
+      }
+      console.log('onTimeUpdate');
+    })
+    // seek之后会执行onWaiting
+    offvocalAudio.onWaiting(() => {
+      console.log('onWaiting')
+      that.setData({
+        waitFlag: true // 标明是onWaiting触发的暂停
+      })
+    })
+
+    // 音频准备就绪的回调
+    offvocalAudio.onCanplay(() => {
+      console.log('onCanplay');
+      if (that.data.waitFlag) { // 如果是onWaiting触发的暂停，就立即播放
+        offvocalAudio.play() // play()方法看上去能重新触发onTimeUpdate()回调
+        that.setData({
+          waitFlag: false // 取消相应的flag标志位
+        })
+      }
+    })
+
+    setTimeout(this.bindChangeRecord, 3000);
+    this.setData({
+      showWait: true
+    })
+  },
   // 滑动取词
   bindScroll: function (e) {
     // 每句歌词80rpx
-    // console.log(e.detail.scrollTop)
+    console.log('bindScroll', e.detail.scrollTop)
     var curShowLyrics = Math.ceil((e.detail.scrollTop + 10 * this.data.rpxTopx) / (80 * this.data.rpxTopx)) - 1;
     this.setData({
       curShowLyrics: curShowLyrics <= 0 ? 0 : curShowLyrics,
-      isScroll: true
+      // showWait: false,
+      // isScroll: true
     })
-    this.setCurLyrics(curShowLyrics);
+    // this.setCurLyrics(curShowLyrics);
   },
   // 防抖设置，delay时间内多次触发，只执行最后一次
   setCurLyrics: util.debounce(function (curShowLyrics) {
     // TODO记录时间节点,修改播放音频位置
-    var seekTime = this.data.lyrics[curShowLyrics].time/1000;
-    offvocalAudio.seek(seekTime);
-    sourceAudio.seek(seekTime);
-    var seekList = this.data.seekList;
-    console.log(seekList.push(seekTime))
+    // console.log(11111);
+    // var seekTime = this.data.lyrics[curShowLyrics].time/1000;
+    // offvocalAudio.seek(seekTime);
+    // sourceAudio.seek(seekTime);
+    // var seekList = this.data.seekList;
+    // console.log('seekList',seekList.push(seekTime))
+    // this.setData({
+    // curLyrics: curShowLyrics,
+    // isScroll: false,
+    // seekList:seekList
+    // })
+  }, 200),
+  touchEnd: function (e) {
+    console.log('touchEnd');
+    var curShowLyrics = this.data.curShowLyrics;
+    var seekTime = this.data.lyrics[curShowLyrics].time / 1000;
+    // offvocalAudio.pause();
+    // sourceAudio.pause();
+    offvocalAudio.seek(seekTime - 3 > 0 ? seekTime - 3 : 0);
+    sourceAudio.seek(seekTime - 3 > 0 ? seekTime - 3 : 0);
+    // offvocalAudio.play();
+    // sourceAudio.play();
+    this.data.seekList.push(seekTime - 3 > 0 ? seekTime - 3 : 0);
+
+    // offvocalAudio.seek(seekTime);
+    // sourceAudio.seek(seekTime);
+    // this.data.seekList.push(seekTime);
+
+    console.log('seekList', this.data.seekList)
     this.setData({
       curLyrics: curShowLyrics,
+      seekList: this.data.seekList,
+      showWait: true,
       isScroll: false,
-      seekList:seekList
+      isSeek: true
     })
-  }, 1000),
+    setTimeout(() => {
+      this.setData({
+        isSeek: false
+      })
+    }, 3000);
+  },
+  bindtouchstart: function (e) {
+    this.setData({
+      isScroll: true,
+      showWait: false
+    })
+    console.log('bindtouchstart')
+  },
   // 切换原唱、伴奏
   bindChangeVocal: function (e) {
-    if(this.data.isOffvocal){
+    if (this.data.isOffvocal) {
       offvocalAudio.volume = 0;
       sourceAudio.volume = 1;
-    }else{
+    } else {
       offvocalAudio.volume = 1;
       sourceAudio.volume = 0;
     }
@@ -141,12 +230,14 @@ Page({
   },
   // 暂停/开始按钮
   bindChangeRecord: function (e) {
-    if(this.data.isRecord){
+    console.log('bindChangeRecord')
+    if (this.data.isRecord) {
       offvocalAudio.pause();
       sourceAudio.pause();
-    }else{
+    } else {
       offvocalAudio.play();
       sourceAudio.play();
+      console.log('bindChangeRecord play')
     }
     this.setData({
       isRecord: !this.data.isRecord

@@ -129,7 +129,8 @@
 }
 
 .my-text-lg{
-  font-size:36rpx !important;
+  font-size:50rpx !important;
+  line-height: 80rpx;
 }
 
 
