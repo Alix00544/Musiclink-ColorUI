@@ -2,7 +2,9 @@
 App({
   globalData: {
     userInfo: null,
-    serveBase:"https://musiclink.caoyu.online/v1"
+    serveBase:"https://musiclink.caoyu.online/v1",
+    cloudCallBase:'https://test-1301509754.file.myqcloud.com',
+    cloudUploadBase:'https://test-1301509754.cos.ap-guangzhou.myqcloud.com'
   },
   onLaunch: function () {
     // 获取系统信息，为custom顶部栏做准备

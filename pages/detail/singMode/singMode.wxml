@@ -11,7 +11,7 @@
 </view> -->
 <cu-custom bgColor="text-white" isBack="{{true}}">
 	<view slot="content">
-		<text class="text-white text-bold">{{song.title}}</text>
+		<text class="text-white text-bold">{{song}}</text>
 	</view>
 </cu-custom>
 
@@ -49,12 +49,12 @@
 
 <view wx:if="{{progress==100 || downloadError != 0}}" class="cu-bar btn-group padding" style="margin-top:15rpx;">
 	<button wx:if="{{downloadError == 0}}" class="cu-btn bg-red shadow-blur round lg" bindtap="bindSing">开始{{TabCur==0?'独唱':'合唱'}}</button>
-		<button wx:if="{{downloadError != 0}}" class="cu-btn bg-red shadow-blur round lg" bindtap="bindSing">重新下载</button>
+		<button wx:if="{{downloadError != 0}}" class="cu-btn bg-red shadow-blur round lg" bindtap="bindReDownload">重新下载</button>
 </view>
 
 <view class="padding text-center" wx:if="{{progress<100 && downloadError == 0}}" style="position:relative;margin-top:15rpx;height:140rpx">
 	<view class="cu-progress round striped active" style="background-color:rgba(255,255,255,0.2);height:80rpx;max-width:50%;">
-		<view class="bg-red" style="width:{{progress<100?progress+'%':''}};"></view>
+		<view class="bg-red" style="width:{{progress}}%;"></view>
 	</view>
 	<view class="text-center text-white" style="width:50%;height:80rpx;position:absolute;top:30rpx;left:25%;line-height:80rpx">{{progress}}%,歌曲正在加载...</view>
 </view>

@@ -1,5 +1,6 @@
 const app = getApp();
 const fileSystemManager = wx.getFileSystemManager();
+const cloudCallBase = app.globalData.cloudCallBase;
 Page({
 
   /**
@@ -11,53 +12,63 @@ Page({
     ScreenWidth: app.globalData.ScreenWidth,
     TabCur: 0,
     selectList: [],
-    loading: true,  // 进度条加载
     progress: 0,
     downloadError: 0, // 文件下载失败，0表示无错误，1表示offvocal失败，2表示source失败
-    song: {
-      "artist": "周杰伦",
-      "title": "演员",
-      "lyrics_url": "https://test-1301509754.file.myqcloud.com/songs/告白气球/lyrics.txt",
-      "id": 1,
-      "album": "光年之外",
-      "cover_url": "https://test-1301509754.file.myqcloud.com/songs/告白气球/cover.jpg",
-      "offvocal_url": "https://test-1301509754.file.myqcloud.com/songs/告白气球/offvocal.mp3",
-      "track_url": "https://test-1301509754.file.myqcloud.com/songs/告白气球/source.mp3"
-    },
   },
 
   /**
    * 生命周期函数--监听页面加载
    */
   onLoad: function (options) {
-    this.getLyrics();
+    var lyrics_url = `${cloudCallBase}/songs/${options.song}/lyrics.txt`;
+    if (wx.getStorageSync('curDownloadSong') == options.song) {
+      this.setData({
+        progress: 100,
+        downloadError: 0,
+        lyrics:wx.getStorageSync('lyrics')
+      })
+    } else {
+      this.getLyrics(lyrics_url);
+      this.clearSavedFileList();
+    }
+    this.setData({
+      song: options.song,
+      lyrics_url: lyrics_url,
+      source: `${cloudCallBase}/songs/${options.song}/source.mp3`,
+      offvocal: `${cloudCallBase}/songs/${options.song}/offvocal.mp3`
+    })
+  },
+  /**
+   * 生命周期函数--监听页面显示
+   */
+  onShow: function () {
+    this.checkAuthRecord();
+  },
+  // 清除内存，之后下载歌曲
+  clearSavedFileList: function () {
     var that = this;
     wx.getSavedFileList({
       success(res) {
         console.log(res);
         var fileList = res.fileList;
+        // 如果缓存中有内容，则删除
         if (fileList.length > 0) {
           wx.removeSavedFile({
             filePath: fileList[0].filePath,
             complete(res) {
               console.log(res);
-              wx.getSavedFileList({
-                success(res) {
-                  console.log(res);
-                  var fileList = res.fileList;
-                  if (fileList.length > 0) {
-                    wx.removeSavedFile({
-                      filePath: fileList[0].filePath,
-                      complete(res) {
-                        console.log(res);
-                        that.getSong();
-                      }
-                    })
-                  } else {
+              // 如果缓存有第二首歌，则删除
+              if (fileList.length > 1) {
+                wx.removeSavedFile({
+                  filePath: fileList[1].filePath,
+                  complete(res) {
+                    console.log(res);
                     that.getSong();
                   }
-                }
-              })
+                })
+              } else {
+                that.getSong();
+              }
             }
           })
         } else {
@@ -66,24 +77,10 @@ Page({
       }
     })
   },
-
-  /**
-   * 生命周期函数--监听页面初次渲染完成
-   */
-  onReady: function () {
-
-  },
-
-  /**
-   * 生命周期函数--监听页面显示
-   */
-  onShow: function () {
-
-  },
-  getSong: function (songid) {
+  getSong: function () {
     var that = this;
     var downloadTask = wx.downloadFile({
-      url: 'https://test-1301509754.file.myqcloud.com/songs/告白气球/offvocal.mp3',
+      url: that.data.offvocal,
       success(res) {
         console.log(res);
         if (res.statusCode == 200) {
@@ -93,9 +90,7 @@ Page({
             tempFilePath: res.tempFilePath,
             success(res) {
               console.log(res)
-              that.setData({
-                savedOffvocalFilePath: res.savedFilePath
-              })
+              wx.setStorageSync('savedOffvocalFilePath', res.savedFilePath);
             },
             fail(err) {
               console.log('savedOffvocalFilePath', err)
@@ -123,7 +118,7 @@ Page({
   getSource: function (songid) {
     var that = this;
     var downloadTask = wx.downloadFile({
-      url: 'https://test-1301509754.file.myqcloud.com/songs/告白气球/source.mp3',
+      url: that.data.source,
       success(res) {
         console.log(res)
         if (res.statusCode == 200) {
@@ -132,9 +127,10 @@ Page({
             tempFilePath: res.tempFilePath,
             success(res) {
               console.log(res)
-              that.setData({
-                savedSourceFilePath: res.savedFilePath
-              })
+              wx.setStorageSync('savedSourceFilePath', res.savedFilePath);
+              if(that.data.downloadError == 0){
+                wx.setStorageSync('curDownloadSong', that.data.song);
+              }
             },
             fail(err) {
               console.log('savedSourceFilePath', err)
@@ -159,35 +155,70 @@ Page({
       })
     })
   },
-  bindSing: function (e) {
-    var tabCur = this.data.TabCur;
+  bindReDownload: function () {
     if (this.data.downloadError == 1) {
       this.getSong();
     } else if (this.data.downloadError == 2) {
       this.getSource();
-    } else if (tabCur == 1 && this.data.selectList.length == 0) {
+    }
+    // 重置状态
+    this.setData({
+      downloadFile: 0
+    })
+  },
+  bindSing: function (e) {
+    var tabCur = this.data.TabCur;
+    var that = this;
+    if (tabCur == 1 && this.data.selectList.length == 0) {
       wx.showToast({
         title: '还未选择歌段,无法进入合唱',
         icon: 'none',
         duration: 2000
       })
+    } else if (this.data.authRecord) {
+      this.navToSing();
     } else {
-      var selectList = this.data.selectList.join(',');
-      wx.navigateTo({
-        url: `../sing/sing?mode=${tabCur}&savedSourceFilePath=${this.data.savedSourceFilePath}&savedOffvocalFilePath=${this.data.savedOffvocalFilePath}&${tabCur == 1 ? '&selectList=' + selectList : ''}`,
+      wx.authorize({
+        scope: 'scope.record',
+        success(res) {
+          that.navToSing();
+        },
+        fail() {
+          wx.showToast({
+            title: '未授权无法进行唱歌,请到我的-设置-授权,对录音进行授权',
+            icon: 'none',
+            duration: 4000
+          })
+        }
       })
     }
-    this.setData({
-      downloadFile: 0
+  },
+  navToSing: function () {
+    wx.setStorageSync('curDownloadSong', this.data.song);
+    var selectList = this.data.selectList.join(',');
+    var tabCur = this.data.TabCur;
+    wx.navigateTo({
+      url: `../sing/sing?mode=${tabCur}&song=${this.data.song}${tabCur == 1 ? '&selectList=' + selectList : ''}`,
     })
   },
-  getLyrics: function (e) {
+  checkAuthRecord: function () {
+    var that = this;
+    wx.getSetting({
+      success(res) {
+        console.log(res);
+        that.setData({
+          authRecord: res.authSetting['scope.record'] || false
+        })
+      }
+    })
+  },
+  getLyrics: function (lyrics_url) {
     var that = this;
     wx.downloadFile({
-      url: this.data.song.lyrics_url,
+      url: lyrics_url,
       success(res) {
+        console.log(res);
         if (res.statusCode === 200) {
-          // res.tempFilePath;
           fileSystemManager.readFile({
             filePath: res.tempFilePath,
             encoding: "utf-8",
@@ -199,6 +230,7 @@ Page({
       }
     })
   },
+  // 解析歌词
   setLyrics: function (data) {
     var reg = /\[(\d\d):(\d\d.\d\d)\]([\S ]+)/g;
     var lyrics = [];

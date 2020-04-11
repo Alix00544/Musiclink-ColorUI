@@ -1,0 +1,19 @@
+<cu-custom bgColor="bg-black" isBack="{{true}}">
+	<view slot="content">
+		<text class="text-bold">告白气球</text>
+	</view>
+</cu-custom>
+
+
+<view class="flex bg-black align-center text-lg padding" style="position:fixed;width:100%;height:120rpx;">
+	<view class="cuIcon-{{isPlay?'stop':'playfill'}}" style="font-size:2em" bindtap="bindPlayChange"></view>
+	<slider style="width:100%" value="{{curTime}}" max="{{duration}}" block-size="15" active-color="red" block-color="red" bindchange="bindChange"></slider>
+	<text>{{curShowTime}}</text>
+</view>
+<view style="padding-top:120rpx"></view>
+
+<view class="cu-bar btn-group padding" style="margin-top:15rpx;">
+	<button class="cu-btn bg-red shadow-blur round lg" bindtap="bindUpload">上传</button>
+	<button class="cu-btn bg-red shadow-blur round lg" bindtap="bindSendDynamic">发布</button>
+	<button class="cu-btn bg-red shadow-blur round lg" bindtap="bindSingAgain">重唱</button>
+</view>

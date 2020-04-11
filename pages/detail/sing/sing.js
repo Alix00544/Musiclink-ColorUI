@@ -3,6 +3,8 @@ const util = require('../../../utils/util');
 const offvocalAudio = wx.createInnerAudioContext();
 const sourceAudio = wx.createInnerAudioContext();
 const recorderManager = wx.getRecorderManager();
+const SoloMode = 0; // 独唱
+const ChorusMode = 1; // 合唱
 
 Page({
   data: {
@@ -21,29 +23,21 @@ Page({
     allShowTime: '00:00', // 歌曲整体展示时间
     seekList: [], // 用户歌词跳转操作记录
     isSeek: false,
-    song: {
-      "artist": "周杰伦",
-      "title": "告白气球",
-      "lyrics_url": "https://test-1301509754.file.myqcloud.com/songs/光年之外/lyrics.txt",
-      "id": 1,
-      "album": "告白气球",
-      "cover_url": "https://test-1301509754.file.myqcloud.com/songs/光年之外/cover.jpg",
-      "offvocal_url": "https://test-1301509754.file.myqcloud.com/songs/光年之外/offvocal.mp3",
-      "track_url": "https://test-1301509754.file.myqcloud.com/songs/光年之外/source.mp3"
-    },
-    savedOffvocalFilePath: 'http://store/wx67a1ce408798b249.o6zAJs3f5ytXxdRDaKuFawUmpnXg.D26NfDiHGr1ycead5c3843a238ccd0359d36e70b1925.mp3',
-    savedSourceFilePath: 'http://store/wx67a1ce408798b249.o6zAJs3f5ytXxdRDaKuFawUmpnXg.uXvnvQPpaK8S972e69e1162edd26b6c131612937125f.mp3'
+    isEnd:false // 标记是否为播放完成时触发上传和页面跳转
   },
 
   /**
    * 生命周期函数--监听页面加载
    */
   onLoad: function (options) {
-    console.log(options)
-    var selectList = [];
-    var selectObj = {};
-    var lyrics = wx.getStorageSync('lyrics');
-    if (options.mode == 1) {
+    console.log('onLoad', options);
+
+    var selectList = [],
+      selectObj = {},
+      lyrics = wx.getStorageSync('lyrics'),
+      savedSourceFilePath = wx.getStorageSync('savedSourceFilePath'),
+      savedOffvocalFilePath = wx.getStorageSync('savedOffvocalFilePath');
+    if (options.mode == ChorusMode) {
       selectList = options.selectList.split(',');
       for (var key in selectList) {
         selectObj[selectList[key]] = true;
@@ -51,40 +45,106 @@ Page({
     }
     this.setData({
       mode: options.mode,   // mode-0表示独唱，mode-1表示合唱
+      song: options.song,
       selectList: selectList,
       selectObj: selectObj,
       lyrics: lyrics,
-      savedSourceFilePath: options.savedSourceFilePath,
-      savedOffvocalFilePath: options.savedOffvocalFilePath
+      savedSourceFilePath: savedSourceFilePath,
+      savedOffvocalFilePath: savedOffvocalFilePath
     })
-  },
-
-  /**
-   * 生命周期函数--监听页面初次渲染完成
-   */
-  onReady: function () {
-
   },
 
   /**
    * 生命周期函数--监听页面显示
    */
-  onShow: function () {
+  onShow: function (options) {
+    console.log('onShow',options)
+    this.init();
+    this.initRecorderManager();
     this.playAudio();
   },
 
-  /**
-   * 生命周期函数--监听页面隐藏
-   */
-  onHide: function () {
-
-  },
-
-  /**
-   * 生命周期函数--监听页面卸载
-   */
   onUnload: function () {
-
+    console.log('onUnload')
+    this.offListener();
+  },
+  init: function () {
+    this.setData({
+      showWait: false,
+      curLyrics: 0,
+      curShowLyrics: 0,
+      isRecord: false,
+      isOffvocal: true,
+      isScroll: false,
+      curTime: 0,
+      allTime: 0,
+      curShowTime: '00:00',
+      allShowTime: '00:00',
+      // seekList: [],
+      isSeek: false,
+      isEnd:false
+    })
+  },
+  offListener: function () {
+    offvocalAudio.offCanplay();
+    offvocalAudio.offEnded();
+    offvocalAudio.offTimeUpdate();
+    offvocalAudio.offWaiting();
+    sourceAudio.offEnded();
+  },
+  initRecorderManager: function () {
+    recorderManager.onStop((res) => {
+      util.myPause()
+      console.log('recorder stop', util.getCurTime(), res)
+      const { tempFilePath } = res;
+      this.setData({
+        recordePath: tempFilePath,
+        recordeDuration: res.duration
+      })
+      // 音频自动播放结束
+      if(this.data.isEnd){
+        this.navToFinished();
+      }
+    })
+    recorderManager.onStart(() => {
+      util.myRest();
+      util.myStart()
+      console.log('recorder start', util.getCurTime())
+    })
+    recorderManager.onPause(() => {
+      util.myPause()
+      console.log('recorder pause', util.getCurTime())
+    })
+    recorderManager.onResume(() => {
+      util.myResume()
+      console.log('recorder resume', util.getCurTime())
+    })
+    // 监听录音因为受到系统占用而被中断开始事件。以下场景会触发此事件：微信语音聊天、微信视频聊天。此事件触发后，录音会被暂停。pause 事件在此事件后触发
+    recorderManager.onInterruptionBegin(() => {
+      console.log("录音因为受到系统占用而被中断");
+      wx.showToast({
+        title: '系统消息导致录音暂停，稍后会自动开始',
+      })
+      recorderManager.pause();
+      offvocalAudio.pause();
+      sourceAudio.pause();
+      this.setData({
+        isRecord: false
+      })
+    })
+    // 系统中断结束
+    recorderManager.onInterruptionEnd(() => {
+      console.log("录音中断结束");
+      recorderManager.resume();
+      offvocalAudio.play();
+      sourceAudio.play();
+      this.setData({
+        isRecord: true
+      })
+    })
+    recorderManager.onError((res) => {
+      console.log("录音错误", res.errMsg)
+    })
   },
   playAudio: function () {
     var that = this;
@@ -156,9 +216,9 @@ Page({
       recorderManager.stop();
       that.setData({
         isRecord: false,
-        showWait: false
+        showWait: false,
+        isEnd: true
       })
-      // 跳转到试听界面 + 取消一系列监听事件
     })
 
     sourceAudio.onEnded(() => {
@@ -166,14 +226,10 @@ Page({
       recorderManager.stop();
       that.setData({
         isRecord: false,
-        showWait: false
+        showWait: false,
+        isEnd: true
       })
-      // 跳转到试听界面+ 取消一系列监听事件
     })
-
-    // offvocalAudio.onSeeked(()=>{
-    //   offvocalAudio.play()
-    // })
 
     setTimeout(function () {
       offvocalAudio.play();
@@ -181,13 +237,6 @@ Page({
       recorderManager.start({
         format: 'mp3'
       });
-      recorderManager.onStop((res) => {
-        console.log('recorder stop', res)
-        const { tempFilePath } = res
-        that.setData({
-          recorderPath: tempFilePath
-        })
-      })
       that.setData({
         isRecord: true
       })
@@ -219,21 +268,20 @@ Page({
     })
   },
   touchEnd: function (e) {
-    // clearTimeout(seekTimer);
-    // 滑动取词结束，设置3秒延迟
+    // 滑动取词结束，seek设置3秒前置
     console.log('touchEnd');
     var curShowLyrics = this.data.curShowLyrics;
-    var seekTime = this.data.lyrics[curShowLyrics].time / 1000;
+    var seekMsTime = this.data.lyrics[curShowLyrics].time;
     // offvocalAudio.pause();
     // sourceAudio.pause();
-    seekTime = seekTime - 3 > 0 ? seekTime - 3 : 0;
-    offvocalAudio.seek(seekTime);
-    sourceAudio.seek(seekTime);
+    seekMsTime = seekMsTime - 3000 > 0 ? seekMsTime - 3000 : 0;
+    offvocalAudio.seek(seekMsTime / 1000);
+    sourceAudio.seek(seekMsTime / 1000);
     // offvocalAudio.play();
     // sourceAudio.play();
-    this.data.seekList.push({ 
-      seekTime: seekTime, 
-      recorderTime: recorderManager.duration 
+    this.data.seekList.push({
+      seekTime: seekMsTime,
+      recorderTime: util.getCurTime()
     });
 
     // offvocalAudio.seek(seekTime);
@@ -311,7 +359,7 @@ Page({
       isScroll: false,
       seekList: [],
       isSeek: false,
-      recorderPath: null
+      recordePath: null
     })
     setTimeout(function () {
       sourceAudio.play();
@@ -345,11 +393,7 @@ Page({
           sourceAudio.stop();
           offvocalAudio.stop();
           recorderManager.stop();
-          // 跳转试听页面
-          var textAudio = wx.createInnerAudioContext()
-          textAudio.src = that.data.recorderPath;
-          textAudio.play();
-
+          that.navToFinished();
         } else if (res.cancel) {
           sourceAudio.play();
           offvocalAudio.play();
@@ -357,6 +401,37 @@ Page({
           that.setData({
             isRecord: true
           })
+        }
+      }
+    })
+  },
+  navToFinished: function () {
+    // TODO 上传音频
+    // 传这么多是为了以备重唱....
+    wx.navigateTo({
+      // url: `../finished/finished?recordePath=${this.data.recordePath}&mode=${this.data.mode}&duration=${this.data.recordeDuration}&song=${this.data.song}&selectList=${this.data.selectList.join(',')}`,
+      url:`../finished/finished?recordePath=${this.data.recordePath}&mode=${this.data.mode}&duration=${this.data.recordeDuration}&song=${this.data.song}`
+    })
+  },
+  BackPage: function () {
+    offvocalAudio.pause();
+    sourceAudio.pause();
+    recorderManager.pause();
+    wx.showModal({
+      title: '确定离开该页面？',
+      content: '离开后当前演唱进度不会被保存',
+      success(res) {
+        if (res.confirm) {
+          offvocalAudio.stop();
+          sourceAudio.stop();
+          recorderManager.stop();
+          wx.switchTab({
+            url: '../../tabbar/sing/sing',
+          })
+        } else if (res.cancel) {
+          offvocalAudio.play();
+          sourceAudio.play();
+          recorderManager.resume();
         }
       }
     })

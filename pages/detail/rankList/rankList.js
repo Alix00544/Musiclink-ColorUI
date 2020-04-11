@@ -1,85 +1,24 @@
 const app = getApp();
+const util = require('../../../utils/util');
 Page({
   data: {
     TabCur: 0,
     scrollLeft: 0,
     CustomBar: app.globalData.CustomBar,
     ScreenHeight:app.globalData.ScreenHeight,
-    ScreenWidth:app.globalData.ScreenWidth,
-    ranklist: [{
-      rankname: "热门榜",
-      songlist: [{
-        name: "温柔1",
-        singer: "五月天",
-        coverImg: "https://p1.music.126.net/s47PMA_wT4IF5HFKfDxhzg==/109951164836564113.jpg"
-      }, {
-        name: "温柔2",
-        singer: "五月天",
-        coverImg: "https://p1.music.126.net/s47PMA_wT4IF5HFKfDxhzg==/109951164836564113.jpg"
-      }, {
-        name: "温柔3",
-        singer: "五月天",
-        coverImg: "https://p1.music.126.net/s47PMA_wT4IF5HFKfDxhzg==/109951164836564113.jpg"
-      },{
-        name: "温柔4",
-        singer: "五月天",
-        coverImg: "https://p1.music.126.net/s47PMA_wT4IF5HFKfDxhzg==/109951164836564113.jpg"
-      }, {
-        name: "温柔5",
-        singer: "五月天",
-        coverImg: "https://p1.music.126.net/s47PMA_wT4IF5HFKfDxhzg==/109951164836564113.jpg"
-      }, {
-        name: "温柔6",
-        singer: "五月天",
-        coverImg: "https://p1.music.126.net/s47PMA_wT4IF5HFKfDxhzg==/109951164836564113.jpg"
-      },{
-        name: "温柔7",
-        singer: "五月天",
-        coverImg: "https://p1.music.126.net/s47PMA_wT4IF5HFKfDxhzg==/109951164836564113.jpg"
-      }, {
-        name: "温柔8",
-        singer: "五月天",
-        coverImg: "https://p1.music.126.net/s47PMA_wT4IF5HFKfDxhzg==/109951164836564113.jpg"
-      }, {
-        name: "温柔9",
-        singer: "五月天",
-        coverImg: "https://p1.music.126.net/s47PMA_wT4IF5HFKfDxhzg==/109951164836564113.jpg"
-      }, {
-        name: "温柔10",
-        singer: "五月天",
-        coverImg: "https://p1.music.126.net/s47PMA_wT4IF5HFKfDxhzg==/109951164836564113.jpg"
-      }]
-    }, {
-      rankname: "外语榜",
-      songlist: [{
-        name: "温柔11",
-        singer: "五月天",
-        coverImg: "https://p1.music.126.net/s47PMA_wT4IF5HFKfDxhzg==/109951164836564113.jpg"
-      }, {
-        name: "温柔22",
-        singer: "五月天",
-        coverImg: "https://p1.music.126.net/s47PMA_wT4IF5HFKfDxhzg==/109951164836564113.jpg"
-      }, {
-        name: "温柔33",
-        singer: "五月天",
-        coverImg: "https://p1.music.126.net/s47PMA_wT4IF5HFKfDxhzg==/109951164836564113.jpg"
-      }]
-    }, {
-      rankname: "抖音榜",
-      songlist: [{
-        name: "温柔111",
-        singer: "五月天",
-        coverImg: "https://p1.music.126.net/s47PMA_wT4IF5HFKfDxhzg==/109951164836564113.jpg"
-      }, {
-        name: "温柔222",
-        singer: "五月天",
-        coverImg: "https://p1.music.126.net/s47PMA_wT4IF5HFKfDxhzg==/109951164836564113.jpg"
-      }, {
-        name: "温柔333",
-        singer: "五月天",
-        coverImg: "https://p1.music.126.net/s47PMA_wT4IF5HFKfDxhzg==/109951164836564113.jpg"
-      }]
-    }]
+    ScreenWidth:app.globalData.ScreenWidth
+  },
+  onLoad:function (options) {
+    this.getRankList()
+  },
+  getRankList:function(){
+    util.requestFromServer('list',{},'GET').then((res)=>{
+      this.setData({
+        ranklist:util.parsingRanklist(res)
+      })
+    }).catch((err)=>{
+      console.log('获取榜单内容失败',err);
+    })
   },
   tabSelect(e) {
     this.setData({
@@ -94,7 +33,13 @@ Page({
     })
   },
   bindSing:function(e){
-    console.log(e.currentTarget.dataset.song);
-    // TODO:跳转至唱歌界面
+    wx.navigateTo({
+      url: '../sing/sing?song='+e.currentTarget.dataset.song,
+    })
+  },
+  bindSong:function(e){
+    wx.navigateTo({
+      url: '../song/song?song='+e.currentTarget.dataset.song,
+    })
   }
 })

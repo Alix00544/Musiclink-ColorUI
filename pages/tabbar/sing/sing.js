@@ -1,17 +1,19 @@
 const app = getApp();
+const util = require("../../../utils/util");
+
 Page({
   data: {
     // 搜索栏搜索值
     searchValue: "",
     // 轮播图列表
     swiperList: [{
-      songid: 111,
+      song: '成都',
       url: 'https://s2.ax1x.com/2020/03/06/3LVAIg.jpg'
     }, {
-      songid: 222,
+      song: '平凡之路',
       url: 'https://s2.ax1x.com/2020/03/06/3LVkdS.jpg',
     }, {
-      songid: 333,
+      song: '刚好遇见你',
       url: 'https://s2.ax1x.com/2020/03/06/3LVFZ8.jpg'
     }],
     // 图标列表
@@ -37,140 +39,7 @@ Page({
     CustomBar: app.globalData.CustomBar,
     WinHeight: app.globalData.WinHeight,
     ScreenWidth:app.globalData.ScreenWidth,
-    scrollViewScorll:false,
-    ranklist: [{
-      rankname: "热门榜",
-      songlist: [{
-        name: "温柔1",
-        singer: "五月天",
-        coverImg: "https://p1.music.126.net/s47PMA_wT4IF5HFKfDxhzg==/109951164836564113.jpg"
-      }, {
-        name: "温柔2",
-        singer: "五月天",
-        coverImg: "https://p1.music.126.net/s47PMA_wT4IF5HFKfDxhzg==/109951164836564113.jpg"
-      }, {
-        name: "温柔3",
-        singer: "五月天",
-        coverImg: "https://p1.music.126.net/s47PMA_wT4IF5HFKfDxhzg==/109951164836564113.jpg"
-      }, {
-        name: "温柔4",
-        singer: "五月天",
-        coverImg: "https://p1.music.126.net/s47PMA_wT4IF5HFKfDxhzg==/109951164836564113.jpg"
-      }, {
-        name: "温柔5",
-        singer: "五月天",
-        coverImg: "https://p1.music.126.net/s47PMA_wT4IF5HFKfDxhzg==/109951164836564113.jpg"
-      }, {
-        name: "温柔6",
-        singer: "五月天",
-        coverImg: "https://p1.music.126.net/s47PMA_wT4IF5HFKfDxhzg==/109951164836564113.jpg"
-      }, {
-        name: "温柔7",
-        singer: "五月天",
-        coverImg: "https://p1.music.126.net/s47PMA_wT4IF5HFKfDxhzg==/109951164836564113.jpg"
-      }, {
-        name: "温柔8",
-        singer: "五月天",
-        coverImg: "https://p1.music.126.net/s47PMA_wT4IF5HFKfDxhzg==/109951164836564113.jpg"
-      }, {
-        name: "温柔9",
-        singer: "五月天",
-        coverImg: "https://p1.music.126.net/s47PMA_wT4IF5HFKfDxhzg==/109951164836564113.jpg"
-      }, {
-        name: "温柔10",
-        singer: "五月天",
-        coverImg: "https://p1.music.126.net/s47PMA_wT4IF5HFKfDxhzg==/109951164836564113.jpg"
-      }]
-    }, {
-      rankname: "外语榜",
-      songlist: [{
-        name: "温柔11",
-        singer: "五月天",
-        coverImg: "https://p1.music.126.net/s47PMA_wT4IF5HFKfDxhzg==/109951164836564113.jpg"
-      }, {
-        name: "温柔22",
-        singer: "五月天",
-        coverImg: "https://p1.music.126.net/s47PMA_wT4IF5HFKfDxhzg==/109951164836564113.jpg"
-      }, {
-        name: "温柔33",
-        singer: "五月天",
-        coverImg: "https://p1.music.126.net/s47PMA_wT4IF5HFKfDxhzg==/109951164836564113.jpg"
-      },{
-        name: "温柔11",
-        singer: "五月天",
-        coverImg: "https://p1.music.126.net/s47PMA_wT4IF5HFKfDxhzg==/109951164836564113.jpg"
-      }, {
-        name: "温柔22",
-        singer: "五月天",
-        coverImg: "https://p1.music.126.net/s47PMA_wT4IF5HFKfDxhzg==/109951164836564113.jpg"
-      }, {
-        name: "温柔33",
-        singer: "五月天",
-        coverImg: "https://p1.music.126.net/s47PMA_wT4IF5HFKfDxhzg==/109951164836564113.jpg"
-      },{
-        name: "温柔11",
-        singer: "五月天",
-        coverImg: "https://p1.music.126.net/s47PMA_wT4IF5HFKfDxhzg==/109951164836564113.jpg"
-      }, {
-        name: "温柔22",
-        singer: "五月天",
-        coverImg: "https://p1.music.126.net/s47PMA_wT4IF5HFKfDxhzg==/109951164836564113.jpg"
-      }, {
-        name: "温柔33",
-        singer: "五月天",
-        coverImg: "https://p1.music.126.net/s47PMA_wT4IF5HFKfDxhzg==/109951164836564113.jpg"
-      }]
-    }, {
-      rankname: "抖音榜",
-      songlist: [{
-        name: "温柔111",
-        singer: "五月天",
-        coverImg: "https://p1.music.126.net/s47PMA_wT4IF5HFKfDxhzg==/109951164836564113.jpg"
-      }, {
-        name: "温柔222",
-        singer: "五月天",
-        coverImg: "https://p1.music.126.net/s47PMA_wT4IF5HFKfDxhzg==/109951164836564113.jpg"
-      }, {
-        name: "温柔333",
-        singer: "五月天",
-        coverImg: "https://p1.music.126.net/s47PMA_wT4IF5HFKfDxhzg==/109951164836564113.jpg"
-      }]
-    },{
-      rankname: "抖音榜2",
-      songlist: [{
-        name: "抖音榜2",
-        singer: "五月天",
-        coverImg: "https://p1.music.126.net/s47PMA_wT4IF5HFKfDxhzg==/109951164836564113.jpg"
-      }]
-    },{
-      rankname: "抖音榜3",
-      songlist: [{
-        name: "抖音榜3",
-        singer: "五月天",
-        coverImg: "https://p1.music.126.net/s47PMA_wT4IF5HFKfDxhzg==/109951164836564113.jpg"
-      }]
-    },{
-      rankname: "抖音榜4",
-      songlist: [{
-        name: "抖音榜4",
-        singer: "五月天",
-        coverImg: "https://p1.music.126.net/s47PMA_wT4IF5HFKfDxhzg==/109951164836564113.jpg"
-      }]
-    },{
-      rankname: "抖音榜5",
-      songlist: [{
-        name: "抖音榜5",
-        singer: "五月天",
-        coverImg: "https://p1.music.126.net/s47PMA_wT4IF5HFKfDxhzg==/109951164836564113.jpg"
-      }]
-    },{
-      rankname: "抖音榜6",
-      songlist: [{
-        name: "抖音榜6",
-        singer: "五月天",
-        coverImg: "https://p1.music.126.net/s47PMA_wT4IF5HFKfDxhzg==/109951164836564113.jpg"
-      }]
-    }]
+    scrollViewScorll:false
   },
   onLoad: function (options) {
     var that = this;
@@ -179,6 +48,19 @@ Page({
         scrollViewEnableHeight:rect.top - that.data.CustomBar - 100 *that.data.ScreenWidth/750
       })
     }).exec();
+  },
+  onShow:function(){
+    this.getRankList()
+  },
+  getRankList:function(){
+    util.requestFromServer('list',{},'GET').then((res)=>{
+      console.log(res);
+      this.setData({
+        ranklist:util.parsingRanklist(res)
+      })
+    }).catch((err)=>{
+      console.log('获取榜单内容失败',err);
+    })
   },
   /** 排行榜切换 */
   tabSelect(e) {
@@ -196,11 +78,13 @@ Page({
   },
   bindSing: function (e) {
     console.log(e.currentTarget.dataset.song);
-    // TODO:跳转至唱歌界面
+    wx.navigateTo({
+      url: '../../detail/singMode/singMode?song='+e.currentTarget.dataset.song,
+    })
   },
   bindNavSong:function(e){
     wx.navigateTo({
-      url: '../../detail/song/song',
+      url: '../../detail/song/song?song='+e.currentTarget.dataset.song,
     })
   },
   // 原来实现的吸顶方法，废弃，太卡顿了
@@ -239,6 +123,7 @@ Page({
   },
   /** 图标栏 */
   bindIconNav: function (e) {
+    // TODO 合唱、独唱页面做区分
     var pageName = e.currentTarget.dataset.curIcon;
     wx.navigateTo({
       url: `../../detail/${pageName}/${pageName}`
@@ -246,8 +131,8 @@ Page({
   },
   /** 轮播图跳转 */
   bindSwiperNav: function (e) {
-    console.log(e.currentTarget.dataset.songId);
-    // TODO:跳转至具体歌曲页面
+    console.log(e.currentTarget.dataset.song);
+    this.bindNavSong(e)
   },
   /** 搜索栏操作函数 */
   bindSearch: function (e) {

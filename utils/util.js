@@ -1,4 +1,5 @@
 var app = getApp();
+var dataParsing = require('dataParsing');
 /*
  *拓展Date方法。得到格式化的日期形式
  *date.format('yyyy-MM-dd')，date.format('yyyy/MM/dd'),date.format('yyyy.MM.dd')
@@ -121,9 +122,57 @@ function getFormatMinTime(second = 0) {
   return `${min}:${sec}`;
 }
 
+
+// 计时器
+var mypauseTime = 0,
+  mystartTime,
+  mypauseStart,
+  isStart = false,
+  isPause = false;
+
+function myStart() {
+  if (!isStart) {
+    myRest();
+    mystartTime = new Date().getTime();
+    isStart = true;
+  }
+}
+
+function myPause() {
+  if (!isPause && isStart) {
+    mypauseStart = new Date().getTime();
+    isPause = true;
+  }
+}
+
+function myResume() {
+  if (isPause) {
+    isPause = false;
+    mypauseTime += new Date().getTime() - mypauseStart;
+  }
+}
+
+function myRest() {
+  mypauseTime = 0;
+  isStart = false;
+  isPause = false;
+}
+
+function getCurTime() {
+  if (!isStart) return 0;
+  if (isPause && isStart) return mypauseStart - mystartTime - mypauseTime;
+  return new Date().getTime() - mystartTime - mypauseTime;
+}
+
 module.exports = {
   requestFromServer: requestFromServer,
   getShowTime: getShowTime,
   debounce: debounce,
-  getFormatMinTime:getFormatMinTime
+  getFormatMinTime:getFormatMinTime,
+  myStart:myStart,
+  myPause:myPause,
+  myResume:myResume,
+  myRest:myRest,
+  getCurTime:getCurTime,
+  parsingRanklist:dataParsing.parsingRanklist
 }

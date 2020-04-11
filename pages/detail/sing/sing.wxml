@@ -1,9 +1,20 @@
 <!-- 自定义顶部栏 -->
-<cu-custom bgColor="text-white" isBack="{{true}}">
+<!-- <cu-custom bgColor="text-white" isBack="{{true}}">
 	<view slot="content">
-		<text class="text-white text-bold">{{song.title}}</text>
+		<text class="text-white text-bold">{{song}}</text>
 	</view>
-</cu-custom>
+</cu-custom> -->
+<view class="cu-custom text-white" style="height:{{CustomBar}}px">
+	<view class="cu-bar fixed" style="height:{{CustomBar}}px;padding-top:{{StatusBar}}px;">
+		<view class="action" bindtap="BackPage">
+			<text class="cuIcon-back"></text>
+		</view>
+		<view class="content" style="top:{{StatusBar}}px">
+			<view class="text-cut text-white text-bold">{{song}}</view>
+		</view>
+	</view>
+</view>
+
 
 <!-- 背景图片 -->
 <image class="my-bg" style="background-image:url('https://pic3.zhimg.com/80/v2-a788f80c7bab3ef36e86ddaf60d0b6f8_720w.jpg');filter:blur(3px) brightness(0.7);"></image>
@@ -49,7 +60,7 @@
 		<!-- 用户头像 mode==1 时显示-->
 		<view wx:if="{{selectObj[index]}}" class="cu-avatar sm round" style="background-image:url(https://ossweb-img.qq.com/images/lol/web201310/skin/big10001.jpg);"></view>
 		<!-- 歌词 -->
-		<view class="title  {{index==curShowLyrics?'text-red text-bold my-text-lg':'text-cut'}} {{mode==0?'':'my-chorus-tittle'}} {{isScroll?'text-cut':''}}" style="font-size:35rpx;line-height:40px;">{{index}}{{item.lyrics}}</view>
+		<view class="title  {{index==curShowLyrics?'text-red text-bold my-text-lg':'text-cut'}} {{mode==0?'':'my-chorus-tittle'}} {{isScroll?'text-cut':''}}" style="font-size:35rpx;line-height:40px;">{{item.lyrics}}</view>
 	</view>
 	<view style="padding-bottom:{{ScreenHeight - CustomBar - (140+100+180) * rpxTopx}}px;"></view>
 </scroll-view>

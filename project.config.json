@@ -124,7 +124,14 @@
 					"id": 9,
 					"name": "pages/detail/sing/sing",
 					"pathName": "pages/detail/sing/sing",
-					"query": "mode=2&selectList=4,5,6,11,12,13",
+					"query": "mode=1&selectList=4,5,6,11,12,13",
+					"scene": null
+				},
+				{
+					"id": 10,
+					"name": "pages/detail/finished/finished",
+					"pathName": "pages/detail/finished/finished",
+					"query": "mode=0&duration=215000&recordePath=https://test-1301509754.file.myqcloud.com/songs/告白气球/source.mp3",
 					"scene": null
 				}
 			]

@@ -11,7 +11,8 @@
     "pages/detail/singer/singer",
     "pages/detail/settings/settings",
     "pages/detail/singMode/singMode",
-    "pages/detail/sing/sing"
+    "pages/detail/sing/sing",
+    "pages/detail/finished/finished"
   ],
   "window": {
     "navigationStyle": "custom",

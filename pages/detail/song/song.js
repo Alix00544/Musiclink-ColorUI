@@ -1,66 +1,37 @@
-// pages/detail/song/song.js
+const app = getApp();
+const util = require('../../../utils/util');
+const cloudCallBase = app.globalData.cloudCallBase;
 Page({
 
-  /**
-   * 页面的初始数据
-   */
   data: {
-
+    cloudCallBase:app.globalData.cloudCallBase
   },
-
-  /**
-   * 生命周期函数--监听页面加载
-   */
   onLoad: function (options) {
-
+    this.getSong(options.song);
   },
-
-  /**
-   * 生命周期函数--监听页面初次渲染完成
-   */
-  onReady: function () {
-
+  getSong:function(title){
+    util.requestFromServer('songs',{title:title},'GET').then((res)=>{
+      console.log(res);
+      this.setData({
+        songId:res.data.data[0].id,
+        song:title,
+        coverImg:`${cloudCallBase}/songs/${title}/cover.jpg`,
+        source:`${cloudCallBase}/songs/${title}/source.mp3`,
+        singer:res.data.data[0].artist
+      })
+      return util.requestFromServer('singlist',{song_id:res.data.data[0].id},'GET')
+    }).then((res)=>{
+      console.log(res);
+      this.setData({
+        userList:res.data.data
+      })
+    }).catch((err)=>{
+      console.log(err);
+    })
   },
-
-  /**
-   * 生命周期函数--监听页面显示
-   */
-  onShow: function () {
-
-  },
-
-  /**
-   * 生命周期函数--监听页面隐藏
-   */
-  onHide: function () {
-
-  },
-
-  /**
-   * 生命周期函数--监听页面卸载
-   */
-  onUnload: function () {
-
-  },
-
-  /**
-   * 页面相关事件处理函数--监听用户下拉动作
-   */
-  onPullDownRefresh: function () {
-
-  },
-
-  /**
-   * 页面上拉触底事件的处理函数
-   */
-  onReachBottom: function () {
-
-  },
-
-  /**
-   * 用户点击右上角分享
-   */
-  onShareAppMessage: function () {
-
+  bindNavSingMode:function(e){
+    wx.navigateTo({
+      url: `../singMode/singMode?song=${this.data.song}&mode=${e.currentTarget.dataset.mode}`,
+    })
   }
 })
