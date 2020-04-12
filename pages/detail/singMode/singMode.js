@@ -1,6 +1,7 @@
 const app = getApp();
 const fileSystemManager = wx.getFileSystemManager();
 const cloudCallBase = app.globalData.cloudCallBase;
+const util = require('../../../utils/util');
 Page({
 
   /**
@@ -28,6 +29,7 @@ Page({
         lyrics:wx.getStorageSync('lyrics')
       })
     } else {
+      this.getSongId(options.song);
       this.getLyrics(lyrics_url);
       this.clearSavedFileList();
     }
@@ -43,6 +45,16 @@ Page({
    */
   onShow: function () {
     this.checkAuthRecord();
+  },
+  getSongId:function(song){
+    // 唱歌页面上传录音需要song-id
+    var that = this;
+    util.requestFromServer('songs',{title:song},'GET').then((res)=>{
+      console.log(res);
+      wx.setStorageSync('curDownloadSongId', res.data.data[0].id);
+    }).catch((err)=>{
+      console.log('获取songId失败')
+    })
   },
   // 清除内存，之后下载歌曲
   clearSavedFileList: function () {
@@ -197,8 +209,9 @@ Page({
     wx.setStorageSync('curDownloadSong', this.data.song);
     var selectList = this.data.selectList.join(',');
     var tabCur = this.data.TabCur;
+    var songId = wx.getStorageSync('curDownloadSongId');
     wx.navigateTo({
-      url: `../sing/sing?mode=${tabCur}&song=${this.data.song}${tabCur == 1 ? '&selectList=' + selectList : ''}`,
+      url: `../sing/sing?mode=${tabCur}&song=${this.data.song}&songId=${songId}${tabCur == 1 ? '&selectList=' + selectList : ''}`,
     })
   },
   checkAuthRecord: function () {

@@ -65,9 +65,9 @@
 	</view>
 </view>
 
+<!-- 播放历史，发布动态 -->
 <view class="box">
-	<!-- 播放历史，发布动态 -->
-	<view class="grid col-2 padding-lr-xl bg-white margin-bottom-sm">
+	<!-- <view class="grid col-2 padding-lr-xl bg-white margin-bottom-sm">
 		<view class="padding-sm">
 			<view class="bg-white padding radius text-center shadow">
 				<view class="text-df" style="height:40rpx;">
@@ -82,7 +82,7 @@
 					发个动态</view>
 			</view>
 		</view>
-	</view>
+	</view> -->
 
 	<!-- 动态，作品，合唱 -->
 	<scroll-view scroll-x class="bg-white nav my-border-bottom" style="height:90rpx;" id="selectView">
@@ -94,7 +94,7 @@
 	</scroll-view>
 
 	<!--内容主体-->
-	<swiper  current="{{TabCur}}" duration="200" bindchange="swiperChange" style='height:{{WinHeight-CustomBar - 90 * ScreenWidth/750}}px'>
+	<swiper current="{{TabCur}}" duration="200" bindchange="swiperChange" style='height:{{WinHeight-CustomBar - 90 * ScreenWidth/750}}px'>
 
 		<!-- 动态 -->
 		<swiper-item class='bg-white'>

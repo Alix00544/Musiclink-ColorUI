@@ -1,5 +1,6 @@
 const app = getApp();
 const util = require('../../../utils/util');
+const COS = require('../../../utils/cos-wx-sdk-v5');
 const offvocalAudio = wx.createInnerAudioContext();
 const sourceAudio = wx.createInnerAudioContext();
 const recorderManager = wx.getRecorderManager();
@@ -23,7 +24,9 @@ Page({
     allShowTime: '00:00', // 歌曲整体展示时间
     seekList: [], // 用户歌词跳转操作记录
     isSeek: false,
-    isEnd:false // 标记是否为播放完成时触发上传和页面跳转
+    isEnd: false, // 标记是否为播放完成时触发上传和页面跳转
+    loadModal: false,
+    insert_id: null
   },
 
   /**
@@ -46,6 +49,7 @@ Page({
     this.setData({
       mode: options.mode,   // mode-0表示独唱，mode-1表示合唱
       song: options.song,
+      songId: options.songId,
       selectList: selectList,
       selectObj: selectObj,
       lyrics: lyrics,
@@ -54,19 +58,19 @@ Page({
     })
   },
 
-  /**
-   * 生命周期函数--监听页面显示
-   */
-  onShow: function (options) {
-    console.log('onShow',options)
-    this.init();
+  onShow: function () {
+    console.log('onShow')
     this.initRecorderManager();
     this.playAudio();
   },
-
+  onHide: function () {
+    offvocalAudio.stop();
+    sourceAudio.stop();
+    recorderManager.stop();
+    this.offListener();
+  },
   onUnload: function () {
     console.log('onUnload')
-    this.offListener();
   },
   init: function () {
     this.setData({
@@ -80,9 +84,11 @@ Page({
       allTime: 0,
       curShowTime: '00:00',
       allShowTime: '00:00',
-      // seekList: [],
+      seekList: [],
       isSeek: false,
-      isEnd:false
+      isEnd: false,
+      loadModal: false,
+      recordePath: null
     })
   },
   offListener: function () {
@@ -102,7 +108,7 @@ Page({
         recordeDuration: res.duration
       })
       // 音频自动播放结束
-      if(this.data.isEnd){
+      if (this.data.isEnd) {
         this.navToFinished();
       }
     })
@@ -147,8 +153,8 @@ Page({
     })
   },
   playAudio: function () {
+    this.init();
     var that = this;
-
     offvocalAudio.src = this.data.savedOffvocalFilePath;
     sourceAudio.src = this.data.savedSourceFilePath;
     sourceAudio.volume = 0;
@@ -248,12 +254,10 @@ Page({
   },
   // 滑动取词
   bindScroll: function (e) {
-    // 每句歌词80rpx
-    // var curShowLyrics = Math.ceil((e.detail.scrollTop + 10 * this.data.rpxTopx) / (80 * this.data.rpxTopx)) - 1;
+    // 每句歌词40px
     if (this.data.isScroll) {
-      // var curShowLyrics = Math.ceil((e.detail.scrollTop + 10 * this.data.rpxTopx) / (80 * this.data.rpxTopx)) - 1;
       var curShowLyrics = Math.ceil((e.detail.scrollTop + 5) / 40) - 1;
-      console.log('bindScroll', e.detail.scrollTop, curShowLyrics)
+      // console.log('bindScroll', e.detail.scrollTop, curShowLyrics)
       if (curShowLyrics != this.data.curShowLyrics) {
         this.setData({
           curShowLyrics: curShowLyrics <= 0 ? 0 : curShowLyrics,
@@ -272,21 +276,12 @@ Page({
     console.log('touchEnd');
     var curShowLyrics = this.data.curShowLyrics;
     var seekMsTime = this.data.lyrics[curShowLyrics].time;
-    // offvocalAudio.pause();
-    // sourceAudio.pause();
+
     seekMsTime = seekMsTime - 3000 > 0 ? seekMsTime - 3000 : 0;
     offvocalAudio.seek(seekMsTime / 1000);
     sourceAudio.seek(seekMsTime / 1000);
-    // offvocalAudio.play();
-    // sourceAudio.play();
-    this.data.seekList.push({
-      seekTime: seekMsTime,
-      recorderTime: util.getCurTime()
-    });
 
-    // offvocalAudio.seek(seekTime);
-    // sourceAudio.seek(seekTime);
-    // this.data.seekList.push(seekTime);
+    this.data.seekList.push(`${util.getCurTime()}-${seekMsTime}`);
 
     console.log('seekList', this.data.seekList)
     this.setData({
@@ -335,31 +330,17 @@ Page({
   // 重唱按钮
   bindRestart: function (e) {
     var that = this;
+    // stop之后，重唱，原唱可能会play失败
     sourceAudio.pause();
     offvocalAudio.pause();
     sourceAudio.seek(0);
     offvocalAudio.seek(0);
 
-    // stop之后，重唱，原唱可能会play失败
-    // sourceAudio.stop();
-    // offvocalAudio.stop();
     recorderManager.stop();
     // 先置为false，再置为true,点点点动画就能播放....不然有可能失效
+    this.init();
     this.setData({
-      showWait: false
-    })
-    this.setData({
-      curShowTime: "00:00",
-      curTime: 0,
-      curLyrics: 0,
-      curShowLyrics: 0,
-      showWait: true,
-      isRecord: false,
-      isOffvocal: true,
-      isScroll: false,
-      seekList: [],
-      isSeek: false,
-      recordePath: null
+      showWait: true
     })
     setTimeout(function () {
       sourceAudio.play();
@@ -406,11 +387,63 @@ Page({
     })
   },
   navToFinished: function () {
-    // TODO 上传音频
-    // 传这么多是为了以备重唱....
-    wx.navigateTo({
-      // url: `../finished/finished?recordePath=${this.data.recordePath}&mode=${this.data.mode}&duration=${this.data.recordeDuration}&song=${this.data.song}&selectList=${this.data.selectList.join(',')}`,
-      url:`../finished/finished?recordePath=${this.data.recordePath}&mode=${this.data.mode}&duration=${this.data.recordeDuration}&song=${this.data.song}`
+    var openid = wx.getStorageSync('openid');
+    var that = this;
+    var insert_id = that.data.insert_id;
+    that.setData({
+      loadModal: true
+    })
+    if (insert_id) {
+      this.uploadFile(insert_id);
+    } else {
+      util.requestFromServer('singlist', { user_id: openid, song_id: that.data.songId, is_shared: that.data.mode }, 'POST').then((res) => {
+        console.log(res);
+        insert_id = res.data.data.insert_id;
+        that.setData({
+          insert_id: insert_id
+        })
+        that.uploadFile(insert_id)
+      }).catch((err) => {
+        console.log('录音上传失败', err);
+      })
+    }
+  },
+  uploadFile: function (insert_id) {
+    var openid = wx.getStorageSync('openid');
+    var that = this;
+    var cos = util.getCos();
+    cos.postObject({
+      Bucket: 'test-1301509754',
+      Region: 'ap-guangzhou',
+      Key: `records/segments/${insert_id}.mp3`, //指定服务器中的存储路径和文件名
+      FilePath: that.data.recordePath, //小程序本地文件的路径
+      onProgress: function (info) {
+        console.log(info.percent * 100);
+        if (info.percent && info.percent == 1) {
+          that.setData({
+            loadModal: false
+          })
+          console.log(`records/segments/${insert_id}.mp3`)
+          util.requestFromServer('participates', {
+            list_id: insert_id,
+            user_id: openid,
+            clips: that.data.selectList.join(','),
+            time_pairs: that.data.seekList.length > 0 ? that.data.seekList.join(',') : '0-0'
+          }, 'POST').then((res) => {
+            console.log("participates",res)
+            wx.showModal({
+              title: '上传文件',
+              content: '上传成功',
+              showCancel: false
+            })
+            wx.navigateTo({
+              url: `../finished/finished?recordePath=${that.data.recordePath}&mode=${that.data.mode}&duration=${that.data.recordeDuration}&song=${that.data.song}&insert_id=${insert_id}`
+            })
+          }).catch((err) => {
+            console.log('participates',err);
+          })
+        }
+      }
     })
   },
   BackPage: function () {

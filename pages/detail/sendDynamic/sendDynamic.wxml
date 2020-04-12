@@ -1,10 +1,10 @@
-<view class="cu-custom text-white" style="height:{{CustomBar}}px">
+<view class="cu-custom bg-white" style="height:{{CustomBar}}px">
 	<view class="cu-bar fixed" style="height:{{CustomBar}}px;padding-top:{{StatusBar}}px;">
 		<view class="action" bindtap="BackPage">
 			<text class="cuIcon-back"></text>
 		</view>
 		<view class="content" style="top:{{StatusBar}}px">
-			<view class="text-cut text-white text-bold">分享动态</view>
+			<view class="text-cut text-bold">分享动态</view>
 		</view>
 	</view>
 </view>
@@ -47,14 +47,14 @@
 </view>
 <view class="cu-list menu-avatar" wx:if="{{curSong}}">
 	<view class="cu-item" style="height:170rpx">
-		<view class="cu-avatar radius lg shadow-blur" style="background-image:url({{curSong.coverImg}});width:150rpx;height:150rpx;opacity:0.8;font-size: 3em;">1</view>
+		<view class="cu-avatar radius lg shadow-blur" style="background-image:url({{curSong.coverImg}});width:150rpx;height:150rpx;opacity:0.8;font-size: 3em;"></view>
 		<view class="content" style="width:calc(100% - 150rpx - 60rpx - 200rpx - 20rpx);left:200rpx;line-height:2em;">
-			<text class="text-cut text-lg">{{curSong.name}}</text>
+			<text class="text-cut text-lg">{{curSong.song}}</text>
 			<view class="text-gray text-sm flex">
 				<text class="text-cut">{{curSong.singer}}</text>
 			</view>
 		</view>
-		<view class="action" style="width:200rpx" bindtap="bindSing" data-song="{{curSong.name}}">
+		<view class="action" style="width:200rpx">
 			<button class="cu-btn line-grey round text-center" style="width:120rpx;height:60rpx;font-size:26rpx;font-weight:normal;" bindtap="bindShowChoose">更换</button>
 		</view>
 	</view>
@@ -75,15 +75,15 @@
 		<scroll-view scroll-y class="bg-white" style="height:100%">
 			<view class="cu-list menu-avatar">
 				<view class="cu-item" style="height:170rpx" wx:for="{{mySongs}}" wx:key="key" wx:for-item="song">
-					<view class="cu-avatar radius lg shadow-blur" style="background-image:url({{song.coverImg}});width:150rpx;height:150rpx;opacity:0.8;font-size: 3em;">{{index+1}}</view>
+					<view class="cu-avatar radius lg shadow-blur" style="background-image:url({{song.coverImg}});width:150rpx;height:150rpx;opacity:0.8;font-size: 3em;"></view>
 					<view class="content" style="width:calc(100% - 150rpx - 60rpx - 200rpx - 20rpx);left:200rpx;line-height:2em;">
-						<view class="text-cut text-lg">{{song.name}}</view>
+						<view class="text-cut text-lg">{{song.song}}</view>
 						<view class="text-gray text-sm flex">
 							<text class="text-cut">{{song.singer}}</text>
 						</view>
 					</view>
-					<view class="action" style="width:200rpx" bindtap="bindSing" data-song="{{song.name}}">
-						<button class="cu-btn line-red round text-center" style="width:120rpx;height:60rpx;font-size:26rpx;font-weight:normal;">选择</button>
+					<view class="action" style="width:200rpx" bindtap="bindChange" data-insert-id="{{song.insertId}}">
+						<button class="cu-btn {{song.insertId == insertId?'line-grey':'line-red'}} round text-center" style="width:120rpx;height:60rpx;font-size:26rpx;font-weight:normal;">{{song.insertId == insertId?'更换':'选择'}}</button>
 					</view>
 				</view>
 			</view>

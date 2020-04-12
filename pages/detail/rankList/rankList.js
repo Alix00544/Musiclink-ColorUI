@@ -30,6 +30,7 @@ Page({
   swiperChange: function (e) {
     this.setData({
       TabCur: e.detail.current,
+      scrollLeft: (e.detail.current - 1) * 60
     })
   },
   bindSing:function(e){

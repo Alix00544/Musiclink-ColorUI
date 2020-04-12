@@ -176,3 +176,8 @@
   padding:0 60rpx 0 12rpx !important;
   width: calc(100% - 48rpx) !important;
 }
+
+.cu-load.load-modal image {
+  width: 120rpx;
+  height: 120rpx;
+}

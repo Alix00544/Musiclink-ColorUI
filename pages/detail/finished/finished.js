@@ -20,7 +20,8 @@ Page({
       recordePath: options.recordePath,
       mode: options.mode,
       duration: parseInt(options.duration / 1000),
-      song:options.song
+      song:options.song,
+      insertId:insert_id
     })
   },
 
@@ -64,6 +65,9 @@ Page({
     })
     recorderAudio.play();
   },
+  onHide:function(){
+    recorderAudio.stop();
+  },
   bindPlayChange: function () {
     if (this.data.isPlay) {
       recorderAudio.pause()
@@ -81,13 +85,13 @@ Page({
       isPlay:true
     })
   },
-  bindUpload: function () {
-
-  },
   bindSendDynamic: function () {
-
+    wx.navigateTo({
+      url: `../sendDynamic/sendDynamic?insertId=${this.data.insertId}&song=${this.data.song}`,
+    })
   },
   bindSingAgain: function () {
+    recorderAudio.stop();
     wx.navigateBack({
       delta: 1
     });

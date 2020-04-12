@@ -1,30 +1,21 @@
 const app = getApp();
+const cloudCallBase = app.globalData.cloudCallBase;
+const util = require('../../../utils/util')
 Page({
 
   /**
    * 页面的初始数据
    */
-  data: {    
+  data: {
     StatusBar: app.globalData.StatusBar,
     CustomBar: app.globalData.CustomBar,
     imgList: [],
     imgMaxNum: 9,
     textareaValue: '',
     textareaMaxNum: 300,
-    curSong: {
-      name: "温柔2",
-      singer: "五月天",
-      coverImg: "https://p1.music.126.net/s47PMA_wT4IF5HFKfDxhzg==/109951164836564113.jpg"
-    },
-    mySongs:[{
-      name: "温柔2",
-      singer: "五月天",
-      coverImg: "https://p1.music.126.net/s47PMA_wT4IF5HFKfDxhzg==/109951164836564113.jpg"
-    },{
-      name: "温柔2",
-      singer: "五月天",
-      coverImg: "https://p1.music.126.net/s47PMA_wT4IF5HFKfDxhzg==/109951164836564113.jpg"
-    }],
+    insertId: null,
+    curSong: null,
+    mySongs: [],
     showChoose: false
   },
 
@@ -32,24 +23,46 @@ Page({
    * 生命周期函数--监听页面加载
    */
   onLoad: function (options) {
-
+    if (options.insertId && options.song) {
+      this.setData({
+        curSong: {
+          insertId: options.insertId,
+          song: options.song,
+          coverImg: `${cloudCallBase}/songs/${options.song}/cover.jpg`,
+          source: `${cloudCallBase}/records/segments/${options.insertId}.mp3`,
+          singer: '暂无'
+        }
+      })
+    }
   },
 
-  /**
-   * 生命周期函数--监听页面初次渲染完成
-   */
-  onReady: function () {
-
-  },
-
-  /**
-   * 生命周期函数--监听页面显示
-   */
   onShow: function () {
-
+    this.getMySongs();
   },
-  BackPage:function(e){
-    if(this.data.imgList.length>0 || this.data.textareaValue.length>0){
+  getMySongs: function () {
+    var that = this;
+    var openid = wx.getStorageSync('openid');
+    util.requestFromServer('singlist', { user_id: openid }, 'GET').then((res) => {
+      console.log(res.data)
+      var mySongs = [];
+      res.data.data.forEach(v => {
+        mySongs.push({
+          insertId: v.id,
+          song: v.title,
+          singer: v.name,
+          coverImg: `${cloudCallBase}/songs/${v.title}/cover.jpg`,
+          source: `${cloudCallBase}/records/segments/${v.id}.mp3`,
+        })
+      })
+      that.setData({
+        mySongs: mySongs
+      })
+    }).catch((err) => {
+      console.log('获取用户作品数据错误', err);
+    })
+  },
+  BackPage: function (e) {
+    if (this.data.imgList.length > 0 || this.data.textareaValue.length > 0) {
       wx.showModal({
         title: '离开动态发布？',
         content: '离开当前页面后，动态内容不会被保存',
@@ -63,14 +76,27 @@ Page({
           }
         }
       })
-    }else{
+    } else {
       wx.navigateBack({
         delta: 1
       });
     }
   },
-  ChooseSong: function (e) {
-
+  bindChange: function (e) {
+    var insertId = e.currentTarget.dataset.insertId;
+    if (insertId != this.data.insertId) {
+      var mySongs = this.data.mySongs;
+      for (let i = 0; i < mySongs.length; i++) {
+        if (mySongs[i].insertId == insertId) {
+          this.setData({
+            curSong: mySongs[i],
+            insertId: mySongs[i].insertId
+          })
+          break;
+        }
+      }
+    }
+    this.bindHideChoose()
   },
   // 隐藏底部音频弹出框
   bindHideChoose: function (e) {
@@ -78,23 +104,66 @@ Page({
       showChoose: false
     })
   },
-  bindShowChoose:function(e){
+  bindShowChoose: function (e) {
     this.setData({
       showChoose: true
     })
   },
   bindSend: function (e) {
-    if(!this.data.curSong){
+    if (!this.data.curSong) {
       wx.showToast({
         title: '还没选择作品哟~',
         icon: 'none',
         duration: 2000
       })
-    }else{
-      // TODO 向对象存储上传图片，录音
-      // TODO 发布动态
+    } else {
+      var cos = util.getCos();
+      var that = this;
+
+      util.requestFromServer('dynamic', {
+        user_id: wx.getStorageSync('openid'),
+        list_id: that.data.insertId,
+        content: that.data.textareaValue || '我唱了一首歌,快来听听吧。',
+        pictures: that.data.imgList.length,
+        is_private: 0
+      }, "POST").then((res) => {
+        var dynamicId = res.data.data.insert_id;
+        var len = this.data.imgList.length;
+        // 向对象存储上传图片
+        if (len > 0) {
+          for (let i = 0; i < len; i++) {
+            (function (i) {
+              console.log(i)
+              cos.postObject({
+                Bucket: 'test-1301509754',
+                Region: 'ap-guangzhou',
+                Key: `pictures/dynamic/${dynamicId}/${i}.jpg`, //指定服务器中的存储路径和文件名
+                FilePath: that.data.imgList[i], //小程序本地文件的路径
+                onProgress: function (info) {
+                  if (info.percent && info.percent == 1) {
+                    console.log(`pictures/dynamic/${dynamicId}/${i}.jpg`);
+                    if (i == len - 1) {
+                      wx.switchTab({
+                        url: '../../tabbar/mine/mine',
+                      })
+                    }
+                  }
+                }
+              })
+            })(i)
+          }
+        } else {
+          wx.switchTab({
+            url: '../../tabbar/mine/mine',
+          })
+        }
+      }).catch((err) => {
+        console.log('获取发布动态失败')
+      })
     }
   },
+
+
   /** 内容操作 */
   textareaInput(e) {
     if (e.detail.value.length == this.data.textareaMaxNum) {
@@ -150,3 +219,6 @@ Page({
     })
   },
 })
+
+
+

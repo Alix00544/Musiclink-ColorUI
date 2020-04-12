@@ -164,6 +164,41 @@ function getCurTime() {
   return new Date().getTime() - mystartTime - mypauseTime;
 }
 
+const COS = require('cos-wx-sdk-v5');
+function getCos() {
+  var cos = new COS({
+    getAuthorization: function (options, callback) {
+      // 异步获取临时密钥
+      //这里可以进行本地缓存来优化来，避免短时间内重复请求获取凭证
+      var cosData = wx.getStorageSync('cosData');
+      if( cosData &&  new Date().getTime() - cosData.StartTime  < cosData.ExpiredTime - cosData.StartTime){
+        callback(cosData);
+      }else{
+        wx.request({
+          url: 'https://musiclink.caoyu.online/v1/tempkey',
+          dataType: 'json',
+          success: function (result) {
+            var data = result.data.data;
+            var credentials = data && data.credentials;
+            if (!data || !credentials) return console.error('credentials invalid');
+            cosData = {
+              TmpSecretId: credentials.TmpSecretId,
+              TmpSecretKey: credentials.TmpSecretKey,
+              XCosSecurityToken: credentials.Token,
+              // 建议返回服务器时间作为签名的开始时间，避免用户浏览器本地时间偏差过大导致签名错误
+              StartTime: data.start_time, // 时间戳，单位秒，如：1580000000
+              ExpiredTime: data.expired_time, // 时间戳，单位秒，如：1580000900
+            };
+            wx.setStorageSync('cosData', cosData);
+            callback(cosData);
+          }
+        });
+      }
+    }
+  });
+  return cos;
+}
+
 module.exports = {
   requestFromServer: requestFromServer,
   getShowTime: getShowTime,
@@ -174,5 +209,6 @@ module.exports = {
   myResume:myResume,
   myRest:myRest,
   getCurTime:getCurTime,
-  parsingRanklist:dataParsing.parsingRanklist
+  parsingRanklist:dataParsing.parsingRanklist,
+  getCos:getCos
 }

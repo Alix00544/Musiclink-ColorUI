@@ -107,7 +107,7 @@
 					"scene": null
 				},
 				{
-					"id": -1,
+					"id": 7,
 					"name": "pages/detail/sendDynamic/sendDynamic",
 					"pathName": "pages/detail/sendDynamic/sendDynamic",
 					"query": "",

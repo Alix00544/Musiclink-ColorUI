@@ -1,5 +1,6 @@
 const app = getApp();
 const util = require('../../../utils/util');
+const cloudCallBase = app.globalData.cloudCallBase;
 Page({
 
   data: {
@@ -33,20 +34,13 @@ Page({
         scrollViewEnableHeight: rect.top - that.data.CustomBar
       })
     }).exec();
-    var openid;
-    if (openid = wx.getStorageSync('openid')) {
-      // this.postSong({user_id:openid,song_id:1});
-      // this.postSong({user_id:openid,song_id:2});
-      // this.postSong({user_id:openid,song_id:4});
-      // this.postDynamic({user_id:openid,list_id:1,content:'折磨生出苦难，苦难又会加剧折磨，凡间这无穷的循环，将有我来终结！',pictures:2});
-      // this.postDynamic({user_id:openid,list_id:3,content:'凡间这无穷的循环，将有我来终结！'});
-      // this.postDynamic({user_id:openid,list_id:2,content:'凡间这无穷的循环，将有我来终结！'});
-      // this.postDynamic({user_id:openid,list_id:4,content:'凡间这无穷的循环，将有我来终结！'});
-      this.getDynamic({ user_id: openid });
-    }
+
   },
   onShow: function () {
-
+    var openid = wx.getStorageSync('openid');
+    if (openid) {
+      this.getDynamic({ user_id: openid });
+    }
   },
   onPageScroll: function (e) {
     // 实现吸顶效果
@@ -121,11 +115,11 @@ Page({
             upNum: v.thumbs,
             commentsNum: v.comments,
             comments: [],
-            paticipators:v.paticipators,
-            song:{
+            paticipators: v.paticipators,
+            song: {
               id: v.list_id,
-              cover: v.cover_url,
-              url: v.source_url,
+              cover: `${cloudCallBase}/songs/${v.title}/cover.jpg`,
+              source: `${cloudCallBase}/records/segments/${v.list_id}.mp3`,
               name: v.title,
               score: v.scores,
               needChorus: v.is_private,
@@ -135,7 +129,7 @@ Page({
           upNums += v.thumbs;
           // 添加图片信息
           for (let i = 0; i < v.pictures; i++) {
-            data.images.push(`https://test-1301509754.file.myqcloud.com/records/pictures/1/${i + 1}.jpg`);
+            data.images.push(`${cloudCallBase}/pictures/dynamic/${v.id}/${i}.jpg`);
           }
           dynamicList.push(data);
         })
@@ -145,27 +139,13 @@ Page({
         dynamicList: dynamicList,
         upNums: upNums
       })
-      wx.setStorageSync('myDynamicList', dynamicList);
     }).catch(err => {
       console.log('获取用户动态失败', err)
     })
   },
-  postSong(data) {
-    util.requestFromServer('singlist', data, 'POST').then(res => {
-      console.log(res);
-    }).catch(err => {
-      console.log('发起用户动态失败')
-    })
-  },
-  postDynamic(data) {
-    util.requestFromServer('dynamic', data, 'POST').then(res => {
-      console.log(res);
-    }).catch(err => {
-      console.log('发起用户动态失败')
-    })
-  },
   /** 用户登录 */
   doLogin: function (e) {
+    var that = this;
     if (e.detail.errMsg == "getUserInfo:ok") {
       // getUserInfo 
       console.log(e);
@@ -186,18 +166,19 @@ Page({
               console.log('login success');
               console.log(res);
               var data = {
-                openid: res.data.data.insert_id,
+                openid: res.data.data[0].openid,
                 name: userInfo.nickName,
                 gender: userInfo.gender,
                 portrait_url: userInfo.avatarUrl,
                 area: userInfo.city
               };
-              console.log(data);
-              wx.setStorageSync('openid', res.data.data.insert_id);
+              // console.log(data);
+              wx.setStorageSync('openid', res.data.data[0].openid);
 
               // 用户注册，根据获得的userinfo向服务器更新数据
               util.requestFromServer('register', data, 'POST').then(res => {
                 console.log('register success');
+                that.getDynamic();
                 console.log(res);
               }).catch(err => {
                 console.log('register error');
