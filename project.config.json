@@ -133,6 +133,13 @@
 					"pathName": "pages/detail/finished/finished",
 					"query": "mode=0&duration=215000&recordePath=https://test-1301509754.file.myqcloud.com/songs/告白气球/source.mp3",
 					"scene": null
+				},
+				{
+					"id": -1,
+					"name": "pages/detail/dynamicDetail/dynamicDetail",
+					"pathName": "pages/detail/dynamicDetail/dynamicDetail",
+					"query": "",
+					"scene": null
 				}
 			]
 		}

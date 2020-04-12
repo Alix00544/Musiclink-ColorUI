@@ -1,4 +1,135 @@
-<cu-custom bgColor="bg-red" isCustom="{{true}}">
-	<view slot="content">动态详情</view>
-</cu-custom>
-<text>pages/detail/dynamicDetail/dynamicDetail.wxml</text>
+<!-- 自定义顶部栏-拥有渐出效果 -->
+<view class="cu-custom">
+  <!-- 直接将opacity渐变加在整体上，会导致设置icon也跟着渐变，为了解决这个问题，将opacity设置在背景色rgba上 -->
+  <view class="cu-bar fixed" style="height:{{CustomBar}}px;padding-top:{{StatusBar}}px;background:rgba(255,255,255,{{navBarOpacity}})">
+    <!-- <view class="action  cuIcon-back{{navBarOpacity>0.6? ' text-black':'fill text-white'}}" bindtap="bindSetting" style="font-size:1.7em;"></view> -->
+    <view class="action border-custom {{navBarOpacity>0.6? ' text-black':'text-white'}}" style="width:{{Custom.width}}px;height:{{Custom.height}}px;margin-left:calc(750rpx - {{Custom.right}}px)">
+      <text class="cuIcon-back" bindtap="BackPage"></text>
+      <text class="cuIcon-homefill" bindtap="toHome"></text>
+    </view>
+    <view class="content" style="top:{{StatusBar}}px">
+      <view class="text-cut text-black text-bold" wx:if="{{navBarOpacity > 0.6}}" style="opacity:{{navBarOpacity}}">
+        {{userInfo.nickName}}
+      </view>
+    </view>
+  </view>
+</view>
+<!-- 用户头像+昵称+背景图片信息 -->
+<view class="cu-item">
+  <!-- 背景图片层 -->
+  <swiper class="screen-swiper square-dot" style="height:{{ScreenWidth}}px;" indicator-dots="true" circular="true" autoplay="true" interval="5000" duration="500">
+    <swiper-item wx:for="{{swiperList}}" wx:key='key'>
+      <image src="{{item}}" mode="aspectFill"></image>
+    </swiper-item>
+  </swiper>
+  <!-- <view class="bg-img" style="height:{{ScreenWidth}}px;background-image:url({{bgImg}});filter:brightness(77%)"></view> -->
+  <!-- 内容层 -->
+  <!-- <view style="width:100%;height:{{ScreenWidth + StatusBar}}px;padding-top:{{StatusBar}}px;position:absolute;top:0;left:0">
+		<view class="cu-bar" style="height:90px;margin-top:40px;">
+			<view class="action">
+				<view class="cu-avatar xl round margin-left {{hasUserInfo?'':'cuIcon-people my-avatar-lg'}}" style="{{hasUserInfo ? 'background-image:url('+userInfo.avatarUrl+')':''}}"></view>
+			</view>
+			<view class="content my-nickname" style="height:100%;line-height:90px;">
+				<text wx:if="{{hasUserInfo}}">{{userInfo.nickName}}</text>
+				<text wx:if="{{!hasUserInfo}}">MusicLink</text>
+			</view>
+			<view class="action cuIcon-right text-white" style="font-size:1.6em">
+			</view>
+		</view> -->
+  <!-- 数据栏 -->
+  <!-- <view class="cu-bar text-white" style="height:50px;justify-content:space-around;width:90%;margin:0 auto;">
+			<view class="my-flex-column">
+				<text class="my-text-lg">{{dynamicList.length}}</text>
+				<text style="font-size: 30rpx;">动态</text>
+			</view>
+			<view class="cuIcon-titles"></view>
+			<view class="my-flex-column">
+				<text class="my-text-lg">{{mySongs.length}}</text>
+				<text style="font-size: 30rpx;">作品</text>
+			</view>
+			<view class="cuIcon-titles"></view>
+			<view class="my-flex-column">
+				<text class="my-text-lg">{{upNums}}</text>
+				<text style="font-size: 30rpx;">获赞</text>
+			</view>
+		</view> 
+	</view> -->
+</view>
+<view scroll-y style="height: 100%" class="bg-white margin-bottom">
+  <view class="cu-card dynamic no-card">
+    <view class="cu-item shadow">
+      <!-- 头像、昵称、时间区 -->
+      <view class="cu-list menu-avatar">
+        <view class="cu-item" style="height: 130rpx;padding-top: 20rpx;">
+          <view class="cu-avatar round lg" style="background-image:url({{bImg}});"></view>
+          <view class="content flex-sub">
+            <view>item.senderNickName</view>
+            <view class="text-gray text-sm flex justify-between">item.sendTime</view>
+          </view>
+        </view>
+      </view>
+      <!-- 文字区 -->
+      <view class="text-content" style="padding-left:146rpx;">item.content</view>
+    </view>
+  </view>
+</view>
+<!-- 评论 -->
+<view class="cu-bar bg-white solid-bottom">
+  <view class="action">
+    <text class="cuIcon-titles text-blue"></text>
+    <text class="text-bold">评论</text>
+  </view>
+</view>
+<view class="cu-list menu-avatar comment">
+  <view class="cu-item">
+    <view class="cu-avatar round" style="background-image:url(https://ossweb-img.qq.com/images/lol/img/champion/Morgana.png);"></view>
+    <view class="content">
+      <view class="text-grey">莫甘娜</view>
+      <view class="text-gray text-content text-df">凯尔，你被自己的光芒变的盲目。</view>
+      <view class="bg-grey padding-sm radius margin-top-sm  text-sm">
+        <view class="flex">
+          <view>凯尔：</view>
+          <view class="flex-sub">妹妹，你在帮他们给黑暗找借口吗?</view>
+        </view>
+      </view>
+      <view class="margin-top-sm flex justify-between">
+        <view class="text-gray text-df">2018年12月4日</view>
+        <view>
+          <text class="cuIcon-appreciatefill text-red"></text>
+          <text class="cuIcon-messagefill text-gray margin-left-sm"></text>
+        </view>
+      </view>
+    </view>
+  </view>
+  <view class="cu-item">
+    <view class="cu-avatar round" style="background-image:url(https://ossweb-img.qq.com/images/lol/web201310/skin/big10006.jpg);"></view>
+    <view class="content">
+      <view class="text-grey">凯尔</view>
+      <view class="text-gray text-content text-df">妹妹，如果不是为了飞翔，我们要这翅膀有什么用?</view>
+      <view class="bg-grey padding-sm radius margin-top-sm  text-sm">
+        <view class="flex">
+          <view>莫甘娜：</view>
+          <view class="flex-sub">如果不能立足于大地，要这双脚又有何用?</view>
+        </view>
+      </view>
+      <view class="margin-top-sm flex justify-between">
+        <view class="text-gray text-df">2018年12月4日</view>
+        <view>
+          <text class="cuIcon-appreciate text-gray"></text>
+          <text class="cuIcon-messagefill text-gray margin-left-sm"></text>
+        </view>
+      </view>
+    </view>
+  </view>
+</view>
+<view style="padding-top:100rpx">
+</view>
+  
+<!-- 回复框 -->
+<view class="cu-bar foot input {{InputBottom!=0?'cur':''}}">
+  <view class="round padding-lr search-form" style="background-color:rgba(0,0,0,0.03);">
+    <input style="padding:0;marigin:0;"  placeholder="唱的真好，夸夸TA~" maxlength="300" cursor-spacing="10"></input>
+    <text class="cuIcon-roundclosefill text-gray" style="font-size:30rpx;margin:0" bindtap="bindSearchChancel"></text>
+  </view>
+  <view class="text-black padding-right">发送</view>
+</view>
