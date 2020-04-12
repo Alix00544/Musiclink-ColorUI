@@ -37,7 +37,7 @@
 			</view>
 			<view class="cuIcon-titles"></view>
 			<view class="my-flex-column">
-				<text class="my-text-lg">100</text>
+				<text class="my-text-lg">{{mySongs.length}}</text>
 				<text style="font-size: 30rpx;">作品</text>
 			</view>
 			<view class="cuIcon-titles"></view>
@@ -66,7 +66,7 @@
 </view>
 
 <!-- 播放历史，发布动态 -->
-<view class="box">
+<view class="box" wx:if="{{hasUserInfo}}">
 	<!-- <view class="grid col-2 padding-lr-xl bg-white margin-bottom-sm">
 		<view class="padding-sm">
 			<view class="bg-white padding radius text-center shadow">
@@ -171,16 +171,23 @@
 		<!-- 作品 -->
 		<swiper-item class='bg-white'>
 			<scroll-view scroll-y="{{scrollViewScorll}}" style="height: 100%;">
-				<view class="bg-blue" style="height:100px">Tab1</view>
-				<view class="bg-black" style="height:100px">2</view>
-				<view class="bg-blue" style="height:100px">3</view>
-				<view class="bg-black" style="height:100px">4</view>
-				<view class="bg-blue" style="height:100px">5</view>
-				<view class="bg-black" style="height:100px">6</view>
-				<view class="bg-blue" style="height:100px">7</view>
-				<view class="bg-black" style="height:100px">8</view>
-				<view class="bg-blue" style="height:100px">9</view>
-				<view class="bg-black" style="height:100px">10</view>
+			<view class="cu-list menu-avatar">
+				<view class="cu-item" style="height:170rpx" wx:for="{{mySongs}}" wx:key="key" wx:for-item="song">
+					<view class="cu-avatar radius lg shadow-blur" style="background-image:url({{song.coverImg}});width:150rpx;height:150rpx;opacity:0.8;font-size: 3em;"></view>
+					<view class="content" style="width:calc(100% - 150rpx - 60rpx - 200rpx - 20rpx);left:200rpx;line-height:2em;">
+						<view class="text-cut text-lg">{{song.song}}</view>
+						<view class="text-gray text-sm flex">
+							<text class="text-cut">{{song.singer}}</text>
+						</view>
+					</view>
+					<view class="action" style="width:200rpx" bindtap="bindChange" data-insert-id="{{song.insertId}}">
+						<!-- <button class="cu-btn {{song.insertId == insertId?'line-grey':'line-red'}} round text-center" style="width:120rpx;height:60rpx;font-size:26rpx;font-weight:normal;">{{song.insertId == insertId?'更换':'选择'}}</button> -->
+						<view class="text-orange text-bold text-lg">
+							{{song.scores}}
+						</view>
+					</view>
+				</view>
+			</view>
 			</scroll-view>
 		</swiper-item>
 

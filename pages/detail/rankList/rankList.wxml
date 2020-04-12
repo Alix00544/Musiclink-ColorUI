@@ -22,7 +22,7 @@
 							<text class="text-cut">{{song.singer}}</text>
 						</view>
 					</view>
-					<view class="action" style="width:200rpx" bindtap="bindSing" data-song="{{song.name}}">
+					<view class="action" style="width:200rpx" catchtap="bindSing" data-song="{{song.name}}">
 						<button class="cu-btn line-red round text-center" style="width:120rpx;height:60rpx;font-size:26rpx;font-weight:normal;">演唱</button>
 					</view>
 				</view>

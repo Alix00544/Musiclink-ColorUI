@@ -16,7 +16,7 @@
 <!-- 填补fixed搜索栏后丢失的空间 -->
 <view style="padding-top:90rpx"></view>
 <!-- 搜索历史 -->
-<view class="box" wx:if="{{searchHistory.length>0}}">
+<view class="box" wx:if="{{searchHistory.length>0 && !showSearch}}">
 	<view class="cu-bar bg-white">
 		<view class="action">
 			<text class="cuIcon-titles text-blue"></text>
@@ -35,7 +35,7 @@
 </view>
 
 <!-- 热门搜索 -->
-<view class="box" wx:if="{{hotSearch.length>0}}">
+<view class="box" wx:if="{{hotSearch.length>0 && !showSearch}}">
 	<view class="cu-bar bg-white">
 		<view class="action">
 			<text class="cuIcon-titles text-red"></text>
@@ -45,6 +45,48 @@
 	<view class="padding-xs flex flex-wrap bg-white">
 		<view class="padding-xs" wx:for="{{hotSearch}}" wx:key="key" data-search-value="{{item}}" bindtap="bindSearchFromTag">
 			<view class="cu-tag  round line-red">{{item}}</view>
+		</view>
+	</view>
+</view>
+
+
+<view wx:if="{{showSearch}}">
+	<view class="cu-bar padding" wx:if="{{searchResult.artists.length + searchResult.song.length == 0}}">
+		暂无搜索结果
+	</view>
+	  
+	<!-- 歌手 -->
+	<view class="cu-bar bg-white" wx:if="{{searchResult.artists.length >0 }}">
+		<view class="action">
+			<text class="cuIcon-titles text-red"></text>
+			<text class="text-bold">歌手</text>
+		</view>
+	</view>
+	<view class="cu-list menu-avatar no-padding">
+		<view class="cu-item" wx:for="{{searchResult.artists}}" wx:key="key" bindtap="bindNavToSinger" data-singer="{{item.name}}">
+			<view class="cu-avatar round lg" style="background-image:url({{item.avatar}});">
+			</view>
+			<view class="content">
+				<view class="text-grey">{{item.name}}
+				</view>
+			</view>
+		</view>
+	</view>
+	<!-- 作品 -->
+	<view class="cu-bar bg-white" wx:if="{{searchResult.song.length >0 }}">
+		<view class="action">
+			<text class="cuIcon-titles text-red"></text>
+			<text class="text-bold">作品</text>
+		</view>
+	</view>
+		<view class="cu-list menu-avatar no-padding">
+		<view class="cu-item" wx:for="{{searchResult.song}}" wx:key="key" bindtap="bindNavToSong" data-song="{{item.name}}">
+			<view class="cu-avatar lg" style="background-image:url('{{item.coverImg}}');">
+			</view>
+			<view class="content">
+				<view class="text-grey">{{item.name}}
+				</view>
+			</view>
 		</view>
 	</view>
 </view>
