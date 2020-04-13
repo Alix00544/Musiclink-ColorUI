@@ -13,11 +13,21 @@ Page({
         showComments: false,
         // 当前动态的评论
         curentComments: [],
-        hotDynamicList: []
+        hotDynamicList: [],
+        // 评论
+        curComments: [],
+        placeholder: '唱的真好，夸夸TA~',
+        inputFocus: false,
+        inputValue: "",
+        curDynamic: []
     },
 
     onLoad: function(options) {
         this.getDynamic();
+        this.setData({
+            openid: wx.getStorageSync('openid'),
+            toUid: wx.getStorageSync('openid')
+        })
     },
     /**
      * 生命周期函数--监听页面显示
@@ -92,11 +102,10 @@ Page({
     },
     // 点击评论按钮
     catchComments: function(e) {
-        // dynamicId
-        // TODO:根据动态ID获取当前评论
+        this.getCommentsById(e.currentTarget.dataset.dynamicId);
         this.setData({
             showComments: true,
-            curentComments: [e.currentTarget.dataset.dynamicId]
+            curDynamicId: e.currentTarget.dataset.dynamicId
         })
     },
     // 隐藏底部评论弹出框
@@ -105,7 +114,6 @@ Page({
             showComments: false
         })
     },
-
     /** 获取动态信息 */
     getDynamic() {
         var that = this;
@@ -139,7 +147,7 @@ Page({
                         }
                         // 添加图片信息
                     for (let i = 0; i < v.pictures; i++) {
-                        data.images.push(`${cloudCallBase}/pictures/dynamic/${v.id}/${i}.jpg`);
+                        data.images.push(`${cloudCallBase}/pictures/dynamic/${v.id}/${v.create_time}-${i}.jpg`);
                     }
                     dynamicListObj[v.id] = data;
                 })
@@ -163,9 +171,92 @@ Page({
                     hotDynamicList: dynamicList
                 })
                 // 对象给动态展示页面用
-            wx.setStorageSync('dynamicListObj', dynamicList);
+            wx.setStorageSync('dynamicListObj', dynamicListObj);
         }).catch(err => {
             console.log('获取用户动态失败', err)
         })
     },
+    // 评论相关函数
+    getCommentsById: function(dynamicId) {
+        var that = this;
+        util.requestFromServer('comment', { dynamic_id: dynamicId }, 'GET').then(res => {
+            console.log('获取最新的评论', res);
+            if (res.data.data.length > 0) {
+                var curComments = res.data.data;
+                curComments.forEach(v => {
+                    v.showReply_time = util.getShowTime(v.reply_time);
+                })
+                that.setData({
+                    curComments: curComments
+                })
+            }
+        }).catch(err => {
+            console.log('获取动态评论失败', err);
+        })
+    },
+    bindToSend: function(e) {
+        this.setData({
+            inputFocus: true,
+            toUid: e.currentTarget.dataset.toUid,
+            placeholder: '回复 ' + e.currentTarget.dataset.toName + '：'
+        })
+    },
+    bindSendComment: function(e) {
+        if (this.data.openid) {
+            if (this.data.inputValue.length > 0) {
+                this.sendComment(this.data.toUid, this.data.inputValue);
+            } else {
+                wx.showToast({
+                    title: '连音符:还未输入内容',
+                    icon: 'none',
+                    duration: 1500
+                });
+            }
+        } else {
+            wx.showModal({
+                title: '提示',
+                content: '还未登录，无法回复评论，请至"我的"页面登录',
+                showCancel: true,
+                cancelText: '取消',
+                confirmText: '去登录',
+                success: (result) => {
+                    if (result.confirm) {
+                        wx.navigateTo({
+                            url: '../mine/mine',
+                        });
+                    }
+                }
+            });
+        }
+    },
+    sendComment: function(toUid, content) {
+        var that = this;
+        util.requestFromServer('comment', {
+            user_id: that.data.openid,
+            to_uid: toUid,
+            content: content,
+            dynamic_id: that.data.curDynamicId
+        }, 'POSt').then(res => {
+            console.log('发送评论成功', res);
+            that.setData({
+                inputFocus: false,
+                toUid: that.data.openid,
+                placeholder: "唱的真好，夸夸TA~",
+                inputValue: ''
+            })
+            that.getCommentsById(that.data.curDynamicId);
+        }).catch(err => {
+            console.log('发布评论失败', err);
+        })
+    },
+    bindCommentInput: function(e) {
+        this.setData({
+            inputValue: e.detail.value
+        })
+    },
+    bindCommentChancel: function(e) {
+        this.setData({
+            inputValue: ""
+        })
+    }
 })

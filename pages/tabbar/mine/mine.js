@@ -154,14 +154,14 @@ Page({
                             source: `${cloudCallBase}/records/segments/${v.list_id}.mp3`,
                             name: v.title,
                             score: v.scores,
-                            needChorus: v.is_private,
+                            needChorus: v.is_shared,
                             listenNum: v.listens
                         }
                     }
                     upNums += v.thumbs;
                     // 添加图片信息
                     for (let i = 0; i < v.pictures; i++) {
-                        data.images.push(`${cloudCallBase}/pictures/dynamic/${v.id}/${i}.jpg`);
+                        data.images.push(`${cloudCallBase}/pictures/dynamic/${v.id}/${v.create_time}-${i}.jpg`);
                     }
                     dynamicList.push(data);
                 })

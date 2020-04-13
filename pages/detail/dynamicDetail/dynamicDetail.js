@@ -14,31 +14,47 @@ Page({
         Custom: app.globalData.Custom,
         navBarOpacity: 0,
         navBarFrontColor: "#ffffff",
-        bgImg: "https://s1.ax1x.com/2020/04/05/Gr0HN4.jpg",
-        swiperList: ["https://s1.ax1x.com/2020/04/05/Gr0HN4.jpg", "https://s1.ax1x.com/2020/04/05/Gr0HN4.jpg", "https://s1.ax1x.com/2020/04/05/Gr0HN4.jpg"],
-        scrollViewEnableHeight: app.globalData.ScreenWidth - app.globalData.CustomBar
+        swiperList: [],
+        scrollViewEnableHeight: app.globalData.ScreenWidth - app.globalData.CustomBar,
+        curComments: [],
+        placeholder: '唱的真好，夸夸TA~',
+        inputFocus: false,
+        inputValue: "",
     },
 
     /**
      * 生命周期函数--监听页面加载
      */
     onLoad: function(options) {
-
+        var openid = wx.getStorageSync('openid');
         this.setData({
-            dynamicId: options.dynamicId
+            dynamicId: options.dynamicId,
+            openid: openid,
+            toUid: openid
         })
     },
     onShow: function() {
-        var curDynamic;
+        var curDynamic, swiperList;
         var dynamicId = this.data.dynamicId;
         var dynamicListObj = wx.getStorageSync('dynamicListObj');
         if (dynamicListObj && dynamicListObj[dynamicId]) {
             curDynamic = dynamicListObj[dynamicId];
+            curDynamic.sendTime = util.getShowTime(curDynamic.creatTime);
+            if (curDynamic.images.length > 0) {
+                swiperList = curDynamic.images;
+            } else {
+                swiperList = [curDynamic.song.cover]
+            }
+            this.setData({
+                swiperList: swiperList,
+                curDynamic: curDynamic
+            })
         } else {
             // 考虑到用户通过分享进入该页面，所以storage中可能没有该数据
-            curDynamic = this.getDynamicById(dynamicId);
-            this.getCommentsById(dynamicId);
+            this.getDynamicById(dynamicId);
         }
+        // 动态的更新频率可能比较高...
+        this.getCommentsById(dynamicId);
     },
     getDynamicById: function(dynamicId) {
         var that = this;
@@ -65,16 +81,17 @@ Page({
                             source: `${cloudCallBase}/records/segments/${value.list_id}.mp3`,
                             name: value.title,
                             score: value.scores,
-                            needChorus: value.is_private,
+                            needChorus: value.is_shared,
                             listenNum: value.listens
                         }
                     }
                     // 添加图片信息
                 for (let i = 0; i < value.pictures; i++) {
-                    curDynamic.images.push(`${cloudCallBase}/pictures/dynamic/${value.id}/${i}.jpg`);
+                    curDynamic.images.push(`${cloudCallBase}/pictures/dynamic/${value.id}/${value.create_time}-${i}.jpg`);
                 }
                 that.setData({
-                    curDynamic: curDynamic
+                    curDynamic: curDynamic,
+                    swiperList: curDynamic.images.length > 0 ? curDynamic.images : [curDynamic.song.cover]
                 })
             }
         }).catch(err => {
@@ -82,7 +99,76 @@ Page({
         })
     },
     getCommentsById: function(dynamicId) {
-
+        var that = this;
+        util.requestFromServer('comment', { dynamic_id: dynamicId }, 'GET').then(res => {
+            console.log('获取最新的评论', res);
+            if (res.data.data.length > 0) {
+                var curComments = res.data.data;
+                curComments.forEach(v => {
+                    v.showReply_time = util.getShowTime(v.reply_time);
+                })
+                that.setData({
+                    curComments: curComments
+                })
+            }
+        }).catch(err => {
+            console.log('获取动态评论失败', err);
+        })
+    },
+    bindToSend: function(e) {
+        this.setData({
+            inputFocus: true,
+            toUid: e.currentTarget.dataset.toUid,
+            placeholder: '回复 ' + e.currentTarget.dataset.toName + '：'
+        })
+    },
+    bindSendComment: function(e) {
+        if (this.data.openid) {
+            if (this.data.inputValue.length > 0) {
+                this.sendComment(this.data.toUid, this.data.inputValue);
+            } else {
+                wx.showToast({
+                    title: '连音符:还未输入内容',
+                    icon: 'none',
+                    duration: 1500
+                });
+            }
+        } else {
+            wx.showModal({
+                title: '提示',
+                content: '还未登录，无法回复评论，请至"我的"页面登录',
+                showCancel: true,
+                cancelText: '取消',
+                confirmText: '去登录',
+                success: (result) => {
+                    if (result.confirm) {
+                        wx.navigateTo({
+                            url: '../../tabbar/mine/mine',
+                        });
+                    }
+                }
+            });
+        }
+    },
+    sendComment: function(toUid, content) {
+        var that = this;
+        util.requestFromServer('comment', {
+            user_id: that.data.curDynamic.userId,
+            to_uid: toUid,
+            content: content,
+            dynamic_id: that.data.dynamicId
+        }, 'POSt').then(res => {
+            console.log('发送评论成功', res);
+            that.setData({
+                inputFocus: false,
+                toUid: that.data.openid,
+                placeholder: "唱的真好，夸夸TA~",
+                inputValue: ''
+            })
+            that.getCommentsById(that.data.dynamicId);
+        }).catch(err => {
+            console.log('发布评论失败', err);
+        })
     },
     onPageScroll: function(e) {
         // 实现吸顶效果
@@ -123,6 +209,16 @@ Page({
     toHome: function() {
         wx.reLaunch({
             url: '/pages/tabbar/sing/sing',
+        })
+    },
+    bindCommentInput: function(e) {
+        this.setData({
+            inputValue: e.detail.value
+        })
+    },
+    bindCommentChancel: function(e) {
+        this.setData({
+            inputValue: ""
         })
     },
 

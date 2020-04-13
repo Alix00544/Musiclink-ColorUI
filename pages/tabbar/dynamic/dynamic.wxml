@@ -2,30 +2,31 @@
 <view class="cus-nav bg-gradual-red fixed">
 	<view style='padding-top:{{StatusBar}}px;height:{{CustomBar-StatusBar}}px;display:flex;width:750rpx;box-sizing:content-box'>
 		<view class="nav-search" bindtap="navToSearch">
-			<image class="my-img-lg" src="../../../images/icon/search.png"></image>
+			<image class="my-img-lg" src="../../../images/icon/search.png" />
 		</view>
 		<view class="swiper-tab">
-			<view class="tab-item {{currentTab==0 ? 'on' : ''}}" data-current="0" bindtap="swichNav">热门</view>
-			<view class="tab-item {{currentTab==1 ? 'on' : ''}}" data-current="1" bindtap="swichNav">合唱</view>
+			<view class="tab-item {{currentTab==0 ? 'on' : ''}}" data-current="0" bindtap="swichNav">
+				热门
+			</view>
+			<view class="tab-item {{currentTab==1 ? 'on' : ''}}" data-current="1" bindtap="swichNav">
+				合唱
+			</view>
 		</view>
 	</view>
 </view>
 <!-- 填补顶部栏的空间 -->
-<view style="padding-top:{{CustomBar}}px"></view>
-
-<!--内容主体-->
+<view style="padding-top:{{CustomBar}}px" />
+<!-- 内容主体 -->
 <swiper current="{{currentTab}}" style='height: {{WinHeight-CustomBar}}px' duration="200" bindchange="swiperChange">
-
-	<!--热门-->
+	<!-- 热门 -->
 	<swiper-item>
 		<scroll-view scroll-y style="height: 100%" class="bg-white">
-
 			<view class="cu-card dynamic no-card solid-bottom" wx:for="{{hotDynamicList}}" wx:key='key' bindtap="bindNavDynamicDetail" data-dynamic-id="{{item.dynamicId}}">
 				<view class="cu-item shadow">
 					<!-- 头像、昵称、时间区 -->
 					<view class="cu-list menu-avatar">
 						<view class="cu-item" style="height: 130rpx;padding-top: 20rpx;">
-							<view class="cu-avatar round lg" style="background-image:url({{item.senderAvatar}});"></view>
+							<view class="cu-avatar round lg" style="background-image:url({{item.senderAvatar}});" />
 							<view class="content flex-sub">
 								<view>{{item.senderNickName}}</view>
 								<view class="text-gray text-sm flex justify-between">
@@ -34,64 +35,59 @@
 							</view>
 						</view>
 					</view>
-
 					<!-- 文字区 -->
-					<view class="text-content" style="padding-left:146rpx;">
-						{{item.content}}
-					</view>
-
+					<view class="text-content" style="padding-left:146rpx;">{{item.content}}</view>
 					<!-- 图片区 -->
 					<view class="grid flex-sub padding-lr col-3 grid-square" style="padding-left:146rpx">
-						<view class="bg-img" style="background-image:url({{img}});" wx:for="{{item.images}}" wx:key="key" wx:for-item="img">
-						</view>
+						<view class="bg-img" style="background-image:url({{img}});" wx:for="{{item.images}}" wx:key="key" wx:for-item="img" />
 					</view>
-
 					<!-- 音频区 -->
 					<view class="cu-list menu-avatar" style="padding-left: 146rpx;padding-right: 30rpx;">
 						<view class="cu-item" style="background-color: #f8f8f8;border-radius: 10px;padding: 0;margin-top: 20rpx;height:150rpx">
 							<view class="cu-avatar radius lg text-bold" style="background-image:url({{item.song.cover}});width:150rpx;height:150rpx;font-size: 3em;left:0;" catchtap="catchPlayAudio" data-song-id="{{item.song.id}}">
-								<text class="cuIcon-{{playingSongId== item.song.id ? 'stop':'playfill'}}" style="opacity:0.5;"></text>
+								<text class="cuIcon-{{playingSongId== item.song.id ? 'stop':'playfill'}}" style="opacity:0.5;" />
 							</view>
 							<view class="content with{{item.song.needChorus?'':'out'}}-chorus" style="left:170rpx;line-height:2em;">
-								<view class="text-lg text-black text-bold">
+									<view class="text-lg text-black text-bold">
 									<text class="text-cut">{{item.song.name}}</text>
-									<text class="text-orange margin-lr-xs">{{item.song.score}}</text>
-								</view>
-								<view class="text-gray text-df flex">
-									<text class="cuIcon-all"></text>
+								<text class="text-orange margin-lr-xs">
+								{{item.song.score}}
+								</text>
+							</view>
+							<view class="text-gray text-df flex">
+								<text class="cuIcon-all" />
 									<text class="margin-lr-xs">{{item.song.listenNum}}</text>
-								</view>
-							</view>
-							<view class="action" wx:if="{{item.song.needChorus}}" style="width:120rpx">
-								<view class="text-center text-black text-bold" style="height: 90rpx;font-size: 16px;line-height: 90rpx;border-left: 1px solid #dedede;" catchtap="catchChorus" data-song-id="{{item.song.id}}">合唱</view>
 							</view>
 						</view>
-					</view>
-
-					<!-- 分享,点赞,评论 -->
-					<view class="text-black flex aligin-center justify-between" style="font-size: 46rpx;padding:22rpx 30rpx 22rpx 146rpx">
-						<view class="flex align-center" catchtap="catchShare" data-song-id="{{item.song.id}}">
-							<text class="cuIcon-share margin-lr-xs"></text>
-							<text style="font-size:30rpx">分享</text>
-						</view>
-						<view class="flex align-center" catchtap="catchComments" data-dynamic-id="{{item.dynamicId}}">
-							<text class="cuIcon-message margin-lr-xs"></text>
-							<text style="font-size:30rpx">{{item.commentsNum}}</text>
-						</view>
-						<view class="flex align-center" catchtap="catchUp" data-dynamic-id="{{item.dynamicId}}">
-							<text class="cuIcon-appreciate margin-lr-xs"></text>
-							<text style="font-size:30rpx">{{item.upNum}}</text>
+						<view class="action" wx:if="{{item.song.needChorus}}" style="width:120rpx">
+							<view class="text-center text-black text-bold" style="height: 90rpx;font-size: 16px;line-height: 90rpx;border-left: 1px solid #dedede;" catchtap="catchChorus" data-song-id="{{item.song.id}}">
+								合唱
+							</view>
 						</view>
 					</view>
 				</view>
+				<!-- 分享,点赞,评论 -->
+				<view class="text-black flex aligin-center justify-between" style="font-size: 46rpx;padding:22rpx 30rpx 22rpx 146rpx">
+					<view class="flex align-center" catchtap="catchShare" data-song-id="{{item.song.id}}">
+						<text class="cuIcon-share margin-lr-xs" />
+							<text style="font-size:30rpx">分享</text>
+					</view>
+					<view class="flex align-center" catchtap="catchComments" data-dynamic-id="{{item.dynamicId}}">
+						<text class="cuIcon-message margin-lr-xs" />
+						<text style="font-size:30rpx">{{item.commentsNum}}</text>
+					</view>
+					<view class="flex align-center" catchtap="catchUp" data-dynamic-id="{{item.dynamicId}}">
+						<text class="cuIcon-appreciate margin-lr-xs" />
+						<text style="font-size:30rpx">{{item.upNum}}</text>
+					</view>
+				</view>
 			</view>
-
+			</view>
 			<!-- 留一截空白 -->
-			<view class='cu-tabbar-height'></view>
+			<view class='cu-tabbar-height' />
 		</scroll-view>
 	</swiper-item>
-
-	<!--合唱-->
+	<!-- 合唱 -->
 	<swiper-item>
 		<scroll-view scroll-y style="height: 100%">
 			<view class="bg-blue" style="height:100px">1</view>
@@ -107,17 +103,45 @@
 		</scroll-view>
 	</swiper-item>
 </swiper>
-
 <!-- 底部评论弹窗 -->
 <view class="cu-modal bottom-modal {{showComments?'show':''}}" bindtap="bindHideComments">
-	<view class="cu-dialog" style="height:60%;" catchtap>
-		<view class="cu-bar bg-white">
+	<view class="cu-dialog bg-white" style="height:60%;" catchtap>
+
+		<view class="cu-bar bg-white solid-bottom">
 			<view class="action text-green">确定</view>
 			<view class="action text-blue" bindtap="bindHideComments">取消</view>
 		</view>
-		<view class="padding-xl">
-			动态id{{curentComments}}的评论
+
+		<view class="cu-list menu-avatar comment">
+			<view class="cu-item solid-bottom" wx:for="{{curComments}}" data-to-uid="{{item.user_id}}" data-to-name="{{item.name}}" bindtap="bindToSend">
+				<view class="cu-avatar round" style="background-image:url({{item.portrait_url}});" />
+				<view class="content" style="width: calc(100% - 96rpx - 60rpx - 120rpx - 20rpx);">
+					<view class="text-red text-bold text-cut margin-bottom-xs">{{item.name}}</view>
+					<view class="text-black text-content text-df text-left">
+						<text class="text-grey" wx:if="{{item.user_id != item.to_uid}}">回复</text>
+						<text class="text-red text-bold margin-lr-sm" wx:if="{{item.user_id != item.to_uid}}">
+						{{item.to_name}}：
+						</text>
+						<text>{{item.content}}</text>
+					</view>
+					<view class="flex justify-end">
+						<view class="text-gray text-df">{{item.showReply_time}}</view>
+					</view>
+				</view>
+			</view>
 		</view>
+
+		<!-- 回复框 -->
+		<view class="cu-bar foot input {{InputBottom!=0?'cur':''}}">
+			<view class="round padding-lr search-form text-left" style="background-color:rgba(0,0,0,0.03);">
+				<input style="padding:0;margin:0;" value="{{inputValue}}" bindinput="bindCommentInput" placeholder="{{placeholder}}" maxlength="300" cursor-spacing="10" focus="{{inputFocus}}" />
+				<text class="cuIcon-roundclosefill text-gray" style="font-size:30rpx;margin:0" bindtap="bindCommentChancel" />
+			</view>
+			<view class="text-black padding-right" bindtap='bindSendComment'>发送</view>
+		</view>
+
+		<!-- 回复框垫子 -->
+		<view style="padding-top:100rpx" />
+		
 	</view>
 </view>
-

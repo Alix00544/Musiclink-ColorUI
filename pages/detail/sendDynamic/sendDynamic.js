@@ -127,7 +127,9 @@ Page({
                 pictures: that.data.imgList.length,
                 is_private: 0
             }, "POST").then((res) => {
+                console.log(res);
                 var dynamicId = res.data.data.insert_id;
+                var createTime = res.data.data.create_time;
                 var len = this.data.imgList.length;
                 // 向对象存储上传图片
                 if (len > 0) {
@@ -137,11 +139,11 @@ Page({
                             cos.postObject({
                                 Bucket: 'test-1301509754',
                                 Region: 'ap-guangzhou',
-                                Key: `pictures/dynamic/${dynamicId}/${i}.jpg`, //指定服务器中的存储路径和文件名
+                                Key: `pictures/dynamic/${dynamicId}/${createTime}-${i}.jpg`, //指定服务器中的存储路径和文件名
                                 FilePath: that.data.imgList[i], //小程序本地文件的路径
                                 onProgress: function(info) {
                                     if (info.percent && info.percent == 1) {
-                                        console.log(`pictures/dynamic/${dynamicId}/${i}.jpg`);
+                                        console.log('上传图片：', `pictures/dynamic/${dynamicId}/${createTime}-${i}.jpg`);
                                         if (i == len - 1) {
                                             wx.switchTab({
                                                 url: '../../tabbar/mine/mine',
