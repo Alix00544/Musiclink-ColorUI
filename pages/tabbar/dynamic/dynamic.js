@@ -44,7 +44,7 @@ Page({
             currentTab: e.detail.current,
         })
     },
-    //跳转到搜索页面
+    // 跳转到搜索页面
     navToSearch: function(e) {
         wx.navigateTo({
             url: "../../detail/search/search"
@@ -109,15 +109,15 @@ Page({
     /** 获取动态信息 */
     getDynamic() {
         var that = this;
-        var hotDynamicList = [];
+        var dynamicListObj = {};
         util.requestFromServer('dynamic', { limit: this.data.hotDynamicList.length + 10 }, 'GET').then(res => {
             if (res.data.data) {
                 console.log('dynamic', res);
                 res.data.data.forEach(v => {
                     var data = {
                             dynamicId: v.id,
-                            senderAvatar: app.globalData.userInfo.avatarUrl,
-                            senderNickName: app.globalData.userInfo.nickName,
+                            senderAvatar: v.portrait_url,
+                            senderNickName: v.name,
                             creatTime: v.create_time,
                             sendTime: util.getShowTime(v.create_time),
                             content: v.content,
@@ -126,6 +126,7 @@ Page({
                             commentsNum: v.comments,
                             comments: [],
                             paticipators: v.paticipators,
+                            userId: v.user_id,
                             song: {
                                 id: v.list_id,
                                 cover: `${cloudCallBase}/songs/${v.title}/cover.jpg`,
@@ -140,13 +141,29 @@ Page({
                     for (let i = 0; i < v.pictures; i++) {
                         data.images.push(`${cloudCallBase}/pictures/dynamic/${v.id}/${i}.jpg`);
                     }
-                    hotDynamicList.push(data);
+                    dynamicListObj[v.id] = data;
                 })
             }
         }).then(res => {
-            that.setData({
-                hotDynamicList: hotDynamicList
+            // 根据时间排序,最新的放在上面,对象根据键值对排序
+            // 对象排序后，微信wx:for 会根据 对象索引升序排序..... 也就是说dynamicList 用对象渲染,会按照动态id排序.
+            // 所以不能使用对象存储
+            // var sortedData = {};
+            // var keysSorted = Object.keys(dynamicList).sort((a,b)=>{
+            //     return dynamicList[b].creatTime - dynamicList[a].creatTime;
+            // })
+            // for(let i=0;i<keysSorted.length;i++){
+            //     sortedData[keysSorted[i]]=dynamicList[keysSorted[i]];
+            // }
+            var dynamicList = Object.values(dynamicListObj).sort((a, b) => {
+                return b.creatTime - a.creatTime;
             })
+
+            that.setData({
+                    hotDynamicList: dynamicList
+                })
+                // 对象给动态展示页面用
+            wx.setStorageSync('dynamicListObj', dynamicList);
         }).catch(err => {
             console.log('获取用户动态失败', err)
         })

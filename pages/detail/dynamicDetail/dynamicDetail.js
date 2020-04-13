@@ -24,19 +24,64 @@ Page({
      */
     onLoad: function(options) {
 
+        this.setData({
+            dynamicId: options.dynamicId
+        })
     },
-
-    /**
-     * 生命周期函数--监听页面初次渲染完成
-     */
-    onReady: function() {
-
-    },
-
-    /**
-     * 生命周期函数--监听页面显示
-     */
     onShow: function() {
+        var curDynamic;
+        var dynamicId = this.data.dynamicId;
+        var dynamicListObj = wx.getStorageSync('dynamicListObj');
+        if (dynamicListObj && dynamicListObj[dynamicId]) {
+            curDynamic = dynamicListObj[dynamicId];
+        } else {
+            // 考虑到用户通过分享进入该页面，所以storage中可能没有该数据
+            curDynamic = this.getDynamicById(dynamicId);
+            this.getCommentsById(dynamicId);
+        }
+    },
+    getDynamicById: function(dynamicId) {
+        var that = this;
+        util.requestFromServer('dynamic', { id: dynamicId }, 'GET').then(res => {
+            if (res.data.data) {
+                console.log('dynamic', res);
+                var value = res.data.data[0];
+                var curDynamic = {
+                        dynamicId: value.id,
+                        senderAvatar: value.portrait_url,
+                        senderNickName: value.name,
+                        creatTime: value.create_time,
+                        sendTime: util.getShowTime(value.create_time),
+                        content: value.content,
+                        images: [],
+                        upNum: value.thumbs,
+                        commentsNum: value.comments,
+                        comments: [],
+                        paticipators: value.paticipators,
+                        userId: value.user_id,
+                        song: {
+                            id: value.list_id,
+                            cover: `${cloudCallBase}/songs/${value.title}/cover.jpg`,
+                            source: `${cloudCallBase}/records/segments/${value.list_id}.mp3`,
+                            name: value.title,
+                            score: value.scores,
+                            needChorus: value.is_private,
+                            listenNum: value.listens
+                        }
+                    }
+                    // 添加图片信息
+                for (let i = 0; i < value.pictures; i++) {
+                    curDynamic.images.push(`${cloudCallBase}/pictures/dynamic/${value.id}/${i}.jpg`);
+                }
+                that.setData({
+                    curDynamic: curDynamic
+                })
+            }
+        }).catch(err => {
+            console.log('获取动态失败', err);
+        })
+    },
+    getCommentsById: function(dynamicId) {
 
     },
     onPageScroll: function(e) {

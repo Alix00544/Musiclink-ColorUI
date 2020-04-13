@@ -57,7 +57,7 @@ Page({
         // 实现吸顶效果
         var scrollTop = e.scrollTop;
         var scrollViewScorll = this.data.scrollViewScorll;
-        if (e.scrollTop < this.data.scrollViewEnableHeight) {
+        if (e.scrollTop < this.data.scrollViewEnableHeight - 1) {
             // 减1是因为，定位值有偏差，但不大
             if (scrollViewScorll) {
                 this.setData({
@@ -98,6 +98,27 @@ Page({
                                     dynamicList: list
                                 })
                                 // TODO 将对象存储中的图片删除
+                            var imgObj = [];
+                            var len = images.length;
+                            if (len > 0) {
+                                for (let i = 0; i < len; i++) {
+                                    imgObj.push({
+                                        Key: images[i].split('' + cloudCallBase + '/')[1]
+                                    })
+                                }
+                                console.log(imgObj);
+                                var cos = util.getCos();
+                                cos.deleteMultipleObject({
+                                    Bucket: 'test-1301509754',
+                                    Region: 'ap-guangzhou',
+                                    Objects: imgObj
+                                }, function(err, data) {
+                                    console.log('用户删除了图片', err || data);
+                                    // 应该对返回参数进行检查
+                                    // 参照下面图片的信息
+                                    // status = 200证明删除成功
+                                });
+                            }
                         }
                     })
                 } else if (res.cancel) {
