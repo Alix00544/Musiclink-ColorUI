@@ -179,15 +179,26 @@ Page({
     // 评论相关函数
     getCommentsById: function(dynamicId) {
         var that = this;
-        util.requestFromServer('comment', { dynamic_id: dynamicId }, 'GET').then(res => {
+        util.requestFromServer('comment', { dynamic_id: dynamicId, limit: 500 }, 'GET').then(res => {
             console.log('获取最新的评论', res);
             if (res.data.data.length > 0) {
                 var curComments = res.data.data;
                 curComments.forEach(v => {
                     v.showReply_time = util.getShowTime(v.reply_time);
                 })
+                var dynamicList = that.data.hotDynamicList;
+                for (let i = 0; i < dynamicList.length; i++) {
+                    if (dynamicList[i].dynamicId == dynamicId) {
+                        dynamicList[i].commentsNum = curComments.length;
+                    }
+                }
                 that.setData({
-                    curComments: curComments
+                    curComments: curComments,
+                    hotDynamicList: dynamicList
+                })
+            } else {
+                that.setData({
+                    curComments: []
                 })
             }
         }).catch(err => {

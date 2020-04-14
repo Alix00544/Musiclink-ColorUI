@@ -1,8 +1,9 @@
 const app = getApp();
 const util = require('../../../utils/util');
-const COS = require('../../../utils/cos-wx-sdk-v5');
-const offvocalAudio = wx.createInnerAudioContext();
-const sourceAudio = wx.createInnerAudioContext();
+// var offvocalAudio = wx.createInnerAudioContext();
+// var sourceAudio = wx.createInnerAudioContext();
+var offvocalAudio;
+var sourceAudio;
 const recorderManager = wx.getRecorderManager();
 const SoloMode = 0; // 独唱
 const ChorusMode = 1; // 合唱
@@ -26,7 +27,8 @@ Page({
         isSeek: false,
         isEnd: false, // 标记是否为播放完成时触发上传和页面跳转
         loadModal: false,
-        singlistInsertId: null
+        participatesInsertId: null, // 为了重唱更新数据
+        singlistInsertId: null // 为了跳转试听界面后，跳转发布作品使用
     },
 
     /**
@@ -56,6 +58,8 @@ Page({
             savedSourceFilePath: savedSourceFilePath,
             savedOffvocalFilePath: savedOffvocalFilePath
         })
+        offvocalAudio = wx.createInnerAudioContext();
+        sourceAudio = wx.createInnerAudioContext();
     },
 
     onShow: function() {
@@ -67,7 +71,7 @@ Page({
         offvocalAudio.stop();
         sourceAudio.stop();
         recorderManager.stop();
-        this.offListener();
+        // this.offListener();
     },
     onUnload: function() {
         offvocalAudio.stop();
@@ -205,23 +209,23 @@ Page({
                 console.log('onTimeUpdate');
             })
             // seek之后会执行onWaiting
-        offvocalAudio.onWaiting(() => {
-            console.log('onWaiting')
-            that.setData({
-                waitFlag: true // 标明是onWaiting触发的暂停
-            })
-        })
+            // offvocalAudio.onWaiting(() => {
+            //     console.log('onWaiting')
+            //     that.setData({
+            //         waitFlag: true // 标明是onWaiting触发的暂停
+            //     })
+            // })
 
-        // 音频准备就绪的回调
-        offvocalAudio.onCanplay(() => {
-            console.log('onCanplay');
-            if (that.data.waitFlag) { // 如果是onWaiting触发的暂停，就立即播放
-                offvocalAudio.play() // play()方法看上去能重新触发onTimeUpdate()回调
-                that.setData({
-                    waitFlag: false // 取消相应的flag标志位
-                })
-            }
-        })
+        // // 音频准备就绪的回调
+        // offvocalAudio.onCanplay(() => {
+        //     console.log('onCanplay');
+        //     if (that.data.waitFlag) { // 如果是onWaiting触发的暂停，就立即播放
+        //         offvocalAudio.play() // play()方法看上去能重新触发onTimeUpdate()回调
+        //         that.setData({
+        //             waitFlag: false // 取消相应的flag标志位
+        //         })
+        //     }
+        // })
         offvocalAudio.onEnded(() => {
             sourceAudio.stop();
             recorderManager.stop();
@@ -399,11 +403,22 @@ Page({
     navToFinished: function() {
         var openid = wx.getStorageSync('openid');
         var that = this;
-        var singlistInsertId = that.data.singlistInsertId;
+        var participatesInsertId = that.data.participatesInsertId;
+
+        // offvocalAudio.destroy();
+        // sourceAudio.destroy();
+        offvocalAudio.seek(0);
+        sourceAudio.seek(0);
+        offvocalAudio.pause();
+        sourceAudio.pause();
+        offvocalAudio.volume = 1;
+        sourceAudio.volume = 0;
+
+
         that.setData({
             loadModal: true
         })
-        if (singlistInsertId) {
+        if (participatesInsertId) {
             // 删除原来上传的录音
             var cos = util.getCos();
             cos.deleteMultipleObject({
@@ -414,12 +429,12 @@ Page({
                 }]
             }, function(err, data) {
                 console.log('用户删除了录音', err || data);
-                that.postParticipates(singlistInsertId);
+                that.updateParticipates(participatesInsertId);
             });
         } else {
             util.requestFromServer('singlist', { user_id: openid, song_id: that.data.songId, is_shared: that.data.mode }, 'POST').then((res) => {
                 console.log(res);
-                singlistInsertId = res.data.data.insert_id;
+                var singlistInsertId = res.data.data.insert_id;
                 that.setData({
                     singlistInsertId: singlistInsertId
                 })
@@ -429,70 +444,52 @@ Page({
             })
         }
     },
+    updateParticipates: function(participatesInsertId) {
+        var that = this;
+        util.requestFromServer('participates', {
+            id: participatesInsertId,
+            clips: that.data.selectList.join(','),
+            time_pairs: that.data.seekList.length > 0 ? that.data.seekList.join(',') : '0-0'
+        }, 'PUT').then(res => {
+            if (res.data.status == 200) {
+                console.log('更新participates 成功', res);
+                that.uploadFile(participatesInsertId, res.data.data.create_time);
+                that.setData({
+                    participatesCreateTime: res.data.data.create_time
+                })
+            }
+        }).catch(err => {
+            console.log('更新participates数据失败', err);
+        })
+    },
     postParticipates: function(singlistInsertId) {
         console.log("发起作品 insert_id", singlistInsertId);
         var openid = wx.getStorageSync('openid');
         var that = this;
         util.requestFromServer('participates', {
-                list_id: singlistInsertId,
-                user_id: openid,
-                clips: that.data.selectList.join(','),
-                time_pairs: that.data.seekList.length > 0 ? that.data.seekList.join(',') : '0-0'
-            }, 'POST').then((res) => {
-                console.log("participates", res)
-                that.uploadFile(res.data.data.insert_id, res.data.data.create_time);
-                that.setData({
-                    participatesInsertId: res.data.data.insert_id,
-                    participatesCreateTime: res.data.data.create_time
-                })
-            }).catch((err) => {
-                console.log('participates', err);
+            list_id: singlistInsertId,
+            user_id: openid,
+            clips: that.data.selectList.join(','),
+            time_pairs: that.data.seekList.length > 0 ? that.data.seekList.join(',') : '0-0'
+        }, 'POST').then((res) => {
+            console.log("participates", res)
+            that.uploadFile(res.data.data.insert_id, res.data.data.create_time);
+            that.setData({
+                participatesInsertId: res.data.data.insert_id,
+                participatesCreateTime: res.data.data.create_time
             })
-            // console.log("uploadFile insert_id", insert_id);
-            // var openid = wx.getStorageSync('openid');
-            // var that = this;
-            // var cos = util.getCos();
-            // cos.postObject({
-            //     Bucket: 'test-1301509754',
-            //     Region: 'ap-guangzhou',
-            //     Key: `records/segments/${insert_id}.mp3`, //指定服务器中的存储路径和文件名
-            //     FilePath: that.data.recordePath, //小程序本地文件的路径
-            //     onProgress: function(info) {
-            //         console.log(info.percent * 100);
-            //         if (info.percent && info.percent == 1) {
-            //             that.setData({
-            //                 loadModal: false
-            //             })
-            //             console.log(`records/segments/${insert_id}.mp3`)
-            //             util.requestFromServer('participates', {
-            //                 list_id: insert_id,
-            //                 user_id: openid,
-            //                 clips: that.data.selectList.join(','),
-            //                 time_pairs: that.data.seekList.length > 0 ? that.data.seekList.join(',') : '0-0'
-            //             }, 'POST').then((res) => {
-            //                 console.log("participates", res)
-            //                 wx.showModal({
-            //                     title: '上传文件',
-            //                     content: '上传成功',
-            //                     showCancel: false
-            //                 })
-            //                 wx.navigateTo({
-            //                     url: `../finished/finished?recordePath=${that.data.recordePath}&mode=${that.data.mode}&duration=${that.data.recordeDuration}&song=${that.data.song}&insert_id=${insert_id}`
-            //                 })
-            //             }).catch((err) => {
-            //                 console.log('participates', err);
-            //             })
-            //         }
-            //     }
-            // })
+        }).catch((err) => {
+            console.log('participates', err);
+        })
     },
-    uploadFile: function(participatesInsertId, createTime) {
+    uploadFile: function(participatesInsertId, participatesCreateTime) {
         var that = this;
         var cos = util.getCos();
+        console.log('uploadFile', that.data.singlistInsertId);
         cos.postObject({
             Bucket: 'test-1301509754',
             Region: 'ap-guangzhou',
-            Key: `records/segments/${createTime}-${participatesInsertId}.mp3`, //指定服务器中的存储路径和文件名
+            Key: `records/segments/${participatesCreateTime}-${participatesInsertId}.mp3`, //指定服务器中的存储路径和文件名
             FilePath: that.data.recordePath, //小程序本地文件的路径
             onProgress: function(info) {
                 console.log(info.percent * 100);
@@ -508,7 +505,7 @@ Page({
                     wx.navigateTo({
                         url: `../finished/finished?recordePath=${that.data.recordePath}&mode=${that.data.mode}&duration=${that.data.recordeDuration}&song=${that.data.song}&insert_id=${that.data.singlistInsertId}`
                     })
-                    console.log(`records/segments/${createTime}-${participatesInsertId}.mp3`)
+                    console.log(`records/segments/${participatesCreateTime}-${participatesInsertId}.mp3`)
                 }
             }
         })

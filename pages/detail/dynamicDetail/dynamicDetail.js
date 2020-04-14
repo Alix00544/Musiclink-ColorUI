@@ -100,7 +100,7 @@ Page({
     },
     getCommentsById: function(dynamicId) {
         var that = this;
-        util.requestFromServer('comment', { dynamic_id: dynamicId }, 'GET').then(res => {
+        util.requestFromServer('comment', { dynamic_id: dynamicId, limit: 500 }, 'GET').then(res => {
             console.log('获取最新的评论', res);
             if (res.data.data.length > 0) {
                 var curComments = res.data.data;
@@ -109,6 +109,10 @@ Page({
                 })
                 that.setData({
                     curComments: curComments
+                })
+            } else {
+                that.setData({
+                    curComments: []
                 })
             }
         }).catch(err => {
@@ -153,7 +157,7 @@ Page({
     sendComment: function(toUid, content) {
         var that = this;
         util.requestFromServer('comment', {
-            user_id: that.data.curDynamic.userId,
+            user_id: that.data.openid,
             to_uid: toUid,
             content: content,
             dynamic_id: that.data.dynamicId

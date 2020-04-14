@@ -81,16 +81,16 @@
   </view>
 </view>
 <view class="cu-list menu-avatar comment">
-  <view class="cu-item" wx:for="{{curComments}}" data-to-uid="{{item.user_id}}" data-to-name="{{item.name}}" bindtap="bindToSend">
+  <view class="cu-item" wx:for="{{curComments}}" style="padding: 10rpx 30rpx 10rpx 120rpx;" data-to-uid="{{item.user_id}}" data-to-name="{{item.name}}" bindtap="bindToSend">
     <view class="cu-avatar round" style="background-image:url({{item.portrait_url}});"></view>
     <view class="content" style="width: calc(100% - 96rpx - 60rpx - 120rpx - 20rpx);">
       <view class="text-red text-bold text-cut margin-bottom-xs">{{item.name}}</view>
       <view class="text-black text-content text-df">
         <text class="text-grey" wx:if="{{item.user_id != item.to_uid}}">回复</text>
-        <text class="text-red text-bold margin-lr-sm" wx:if="{{item.user_id != item.to_uid}}">{{item.to_name}}：</text>
+        <text class="text-black margin-lr-sm" wx:if="{{item.user_id != item.to_uid}}">{{item.to_name}}：</text>
         <text>{{item.content}}</text>
       </view>
-      <view class="flex justify-end">
+      <view class="flex justify-end" style="font-size:25rpx">
         <view class="text-gray text-df">{{item.showReply_time}}</view>
       </view>
     </view>
