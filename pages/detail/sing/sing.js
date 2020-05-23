@@ -1,9 +1,7 @@
 const app = getApp();
 const util = require('../../../utils/util');
-// var offvocalAudio = wx.createInnerAudioContext();
-// var sourceAudio = wx.createInnerAudioContext();
-var offvocalAudio;
-var sourceAudio;
+var offvocalAudio = null,
+    sourceAudio = null;
 const recorderManager = wx.getRecorderManager();
 const SoloMode = 0; // 独唱
 const ChorusMode = 1; // 合唱
@@ -13,6 +11,7 @@ Page({
         CustomBar: app.globalData.CustomBar,
         ScreenHeight: app.globalData.ScreenHeight,
         rpxTopx: app.globalData.ScreenWidth / 750,
+
         showWait: false, // 歌词倒计时是否显示
         curLyrics: 0, // 当前应该唱的句子
         curShowLyrics: 0, // 当前展示的标红句子，该值在用户取词时会与curLyric不同
@@ -35,7 +34,7 @@ Page({
      * 生命周期函数--监听页面加载
      */
     onLoad: function(options) {
-        console.log('onLoad', options);
+        console.log('唱歌页面onLoad', options);
         console.log(app.globalData)
 
         var selectList = [],
@@ -49,6 +48,13 @@ Page({
                 selectObj[selectList[key]] = true;
             }
         }
+        offvocalAudio = wx.createInnerAudioContext();
+        sourceAudio = wx.createInnerAudioContext();
+        this.initAudio();
+        // 初始化音频源地址、原伴奏音量
+        offvocalAudio.src = savedOffvocalFilePath;
+        sourceAudio.src = savedSourceFilePath;
+
         this.setData({
             mode: options.mode, // mode-0表示独唱，mode-1表示合唱
             song: options.song,
@@ -58,31 +64,52 @@ Page({
             lyrics: lyrics,
             savedSourceFilePath: savedSourceFilePath,
             savedOffvocalFilePath: savedOffvocalFilePath,
-            userAvatar:app.globalData.userInfo.avatarUrl
+            userAvatar: app.globalData.userInfo.avatarUrl
         })
-        offvocalAudio = wx.createInnerAudioContext();
-        sourceAudio = wx.createInnerAudioContext();
     },
 
     onShow: function() {
-        console.log('onShow')
+        var that = this;
+        console.log('唱歌页面onShow')
+        this.initData();
+        offvocalAudio.volume = 1;
+        sourceAudio.volume = 0;
+
         this.initRecorderManager();
-        this.playAudio();
+        setTimeout(function() {
+            offvocalAudio.play();
+            sourceAudio.play();
+            recorderManager.start({
+                format: 'mp3'
+            });
+            that.setData({
+                isRecord: true
+            })
+        }, 3000);
+
+        this.setData({
+            showWait: true
+        })
     },
     onHide: function() {
-        offvocalAudio.stop();
-        sourceAudio.stop();
+        console.log('唱歌页面onHide');
+        // 此处音频不能使用stop,会出意想不到的问题
+        offvocalAudio.pause();
+        sourceAudio.pause();
+        offvocalAudio.seek(0);
+        sourceAudio.seek(0);
         recorderManager.stop();
-        // this.offListener();
     },
     onUnload: function() {
-        offvocalAudio.stop();
-        sourceAudio.stop();
+        console.log('唱歌页面onUnload')
+        offvocalAudio.pause();
+        sourceAudio.pause();
+        offvocalAudio.seek(0);
+        sourceAudio.seek(0);
         recorderManager.stop();
         this.offListener();
-        console.log('onUnload')
     },
-    init: function() {
+    initData: function() {
         this.setData({
             showWait: false,
             curLyrics: 0,
@@ -98,15 +125,15 @@ Page({
             isSeek: false,
             isEnd: false,
             loadModal: false,
+
             recordePath: null
         })
     },
     offListener: function() {
-        offvocalAudio.offCanplay();
         offvocalAudio.offEnded();
         offvocalAudio.offTimeUpdate();
-        offvocalAudio.offWaiting();
         sourceAudio.offEnded();
+
     },
     initRecorderManager: function() {
         recorderManager.onStop((res) => {
@@ -131,24 +158,27 @@ Page({
             util.myPause()
             console.log('recorder pause', util.getCurTime())
         })
+
         recorderManager.onResume(() => {
-                util.myResume()
-                console.log('recorder resume', util.getCurTime())
-            })
-            // 监听录音因为受到系统占用而被中断开始事件。以下场景会触发此事件：微信语音聊天、微信视频聊天。此事件触发后，录音会被暂停。pause 事件在此事件后触发
+            util.myResume()
+            console.log('recorder resume', util.getCurTime())
+        })
+
+        // 监听录音因为受到系统占用而被中断开始事件。以下场景会触发此事件：微信语音聊天、微信视频聊天。此事件触发后，录音会被暂停。pause 事件在此事件后触发
         recorderManager.onInterruptionBegin(() => {
-                console.log("录音因为受到系统占用而被中断");
-                wx.showToast({
-                    title: '系统消息导致录音暂停，稍后会自动开始',
-                })
-                recorderManager.pause();
-                offvocalAudio.pause();
-                sourceAudio.pause();
-                this.setData({
-                    isRecord: false
-                })
+            console.log("录音因为受到系统占用而被中断");
+            wx.showToast({
+                title: '系统消息导致录音暂停，稍后会自动开始',
             })
-            // 系统中断结束
+            recorderManager.pause();
+            offvocalAudio.pause();
+            sourceAudio.pause();
+            this.setData({
+                isRecord: false
+            })
+        })
+
+        // 系统中断结束
         recorderManager.onInterruptionEnd(() => {
             console.log("录音中断结束");
             recorderManager.resume();
@@ -162,72 +192,49 @@ Page({
             console.log("录音错误", res.errMsg)
         })
     },
-    playAudio: function() {
-        this.init();
+    initAudio: function() {
         var that = this;
-        offvocalAudio.src = this.data.savedOffvocalFilePath;
-        sourceAudio.src = this.data.savedSourceFilePath;
-        offvocalAudio.volume = 1;
-        sourceAudio.volume = 0;
-
         offvocalAudio.onTimeUpdate((res) => {
-                var curMsTime = offvocalAudio.currentTime * 1000;
-                var lyrics = that.data.lyrics;
-                var curLyrics = 0;
-                if (that.data.allShowTime == '00:00') {
-                    that.setData({
-                        allShowTime: util.getFormatMinTime(offvocalAudio.duration)
-                    })
-                }
+            var curMsTime = offvocalAudio.currentTime * 1000;
+            var lyrics = that.data.lyrics;
+            var curLyrics = 0;
+            if (that.data.allShowTime == '00:00') {
+                that.setData({
+                    allShowTime: util.getFormatMinTime(offvocalAudio.duration)
+                })
+            }
 
-                if (this.data.isScroll) {
-                    that.setData({
-                        curTime: curMsTime / 1000,
-                        curShowTime: util.getFormatMinTime(offvocalAudio.currentTime)
-                    })
-                } else {
-                    for (let i = 1; i < lyrics.length; i++) {
-                        if (curMsTime < lyrics[0].time) {
-                            curLyrics = 0;
-                            break;
-                        } else if (curMsTime >= lyrics[lyrics.length - 1].time) {
-                            curLyrics = lyrics.length - 1;
-                            break;
-                        } else if (lyrics[i - 1].time <= curMsTime && curMsTime < lyrics[i].time) {
-                            curLyrics = i - 1;
-                            break;
-                        }
+            if (this.data.isScroll) {
+                that.setData({
+                    curTime: curMsTime / 1000,
+                    curShowTime: util.getFormatMinTime(offvocalAudio.currentTime)
+                })
+            } else {
+                for (let i = 1; i < lyrics.length; i++) {
+                    if (curMsTime < lyrics[0].time) {
+                        curLyrics = 0;
+                        break;
+                    } else if (curMsTime >= lyrics[lyrics.length - 1].time) {
+                        curLyrics = lyrics.length - 1;
+                        break;
+                    } else if (lyrics[i - 1].time <= curMsTime && curMsTime < lyrics[i].time) {
+                        curLyrics = i - 1;
+                        break;
                     }
-                    if (that.data.isSeek) {
-                        curLyrics = curLyrics == 0 ? 0 : curLyrics + 1;
-                    }
-                    that.setData({
-                        curTime: curMsTime / 1000,
-                        curShowTime: util.getFormatMinTime(offvocalAudio.currentTime),
-                        curLyrics: curLyrics,
-                        curShowLyrics: curLyrics
-                    })
                 }
-                console.log('onTimeUpdate');
-            })
-            // seek之后会执行onWaiting
-            // offvocalAudio.onWaiting(() => {
-            //     console.log('onWaiting')
-            //     that.setData({
-            //         waitFlag: true // 标明是onWaiting触发的暂停
-            //     })
-            // })
+                if (that.data.isSeek) {
+                    curLyrics = curLyrics == 0 ? 0 : curLyrics + 1;
+                }
+                that.setData({
+                    curTime: curMsTime / 1000,
+                    curShowTime: util.getFormatMinTime(offvocalAudio.currentTime),
+                    curLyrics: curLyrics,
+                    curShowLyrics: curLyrics
+                })
+            }
+            console.log('onTimeUpdate');
+        })
 
-        // // 音频准备就绪的回调
-        // offvocalAudio.onCanplay(() => {
-        //     console.log('onCanplay');
-        //     if (that.data.waitFlag) { // 如果是onWaiting触发的暂停，就立即播放
-        //         offvocalAudio.play() // play()方法看上去能重新触发onTimeUpdate()回调
-        //         that.setData({
-        //             waitFlag: false // 取消相应的flag标志位
-        //         })
-        //     }
-        // })
         offvocalAudio.onEnded(() => {
             sourceAudio.stop();
             recorderManager.stop();
@@ -246,21 +253,6 @@ Page({
                 showWait: false,
                 isEnd: true
             })
-        })
-
-        setTimeout(function() {
-            offvocalAudio.play();
-            sourceAudio.play();
-            recorderManager.start({
-                format: 'mp3'
-            });
-            that.setData({
-                isRecord: true
-            })
-        }, 3000);
-
-        this.setData({
-            showWait: true
         })
     },
     // 滑动取词
@@ -349,7 +341,7 @@ Page({
 
         recorderManager.stop();
         // 先置为false，再置为true,点点点动画就能播放....不然有可能失效
-        this.init();
+        this.initData();
         this.setData({
             showWait: true
         })
@@ -358,7 +350,6 @@ Page({
             offvocalAudio.play();
             sourceAudio.volume = 0;
             offvocalAudio.volume = 1;
-            // TODO 开始录音
             recorderManager.start({
                 format: 'mp3'
             });
@@ -382,9 +373,10 @@ Page({
             confirmText: '确认结束',
             success(res) {
                 if (res.confirm) {
-                    sourceAudio.stop();
-                    offvocalAudio.stop();
+                    // sourceAudio.stop();
+                    // offvocalAudio.stop();
                     recorderManager.stop();
+
                     // 不要直接调用navToFinished,因为此时录音onStop可能还未触发，录音地址为空，上传失败
                     // that.navToFinished();
                     // 设置isEnd标志符，触发onStop时，会执行navToFinished(),此时录音地址已经存在
@@ -406,16 +398,6 @@ Page({
         var openid = wx.getStorageSync('openid');
         var that = this;
         var participatesInsertId = that.data.participatesInsertId;
-
-        // offvocalAudio.destroy();
-        // sourceAudio.destroy();
-        offvocalAudio.seek(0);
-        sourceAudio.seek(0);
-        offvocalAudio.pause();
-        sourceAudio.pause();
-        offvocalAudio.volume = 1;
-        sourceAudio.volume = 0;
-
 
         that.setData({
             loadModal: true

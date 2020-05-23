@@ -46,7 +46,7 @@ Page({
                     curTime: recorderAudio.currentTime
                 })
             })
-        seek之后会执行onWaiting
+            //seek之后会执行onWaiting
         recorderAudio.onWaiting(() => {
             console.log('onWaiting')
             this.setData({
@@ -90,7 +90,7 @@ Page({
         })
     },
     bindSendDynamic: function() {
-        wx.navigateTo({
+        wx.redirectTo({
             url: `../sendDynamic/sendDynamic?insertId=${this.data.insertId}&song=${this.data.song}`,
         })
         console.log(`../sendDynamic/sendDynamic?insertId=${this.data.insertId}&song=${this.data.song}`);
