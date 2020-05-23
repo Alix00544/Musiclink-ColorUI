@@ -78,6 +78,7 @@ Page({
     debounceSearch: util.debounce(function(searchValue) {
         this.getSearch(searchValue)
     }, 1000),
+    
     // 搜索栏基本操作函数
     bindSearch: function(e) {
         var searchValue = this.data.searchValue;

@@ -20,7 +20,13 @@
 <swiper current="{{currentTab}}" style='height: {{WinHeight-CustomBar}}px' duration="200" bindchange="swiperChange">
 	<!-- 热门 -->
 	<swiper-item>
-		<scroll-view scroll-y style="height: 100%" class="bg-white">
+		<scroll-view scroll-y style="height: 100%" class="bg-white" 
+		refresher-enabled="true" 
+		refresher-triggered="{{trigger}}" 
+		bindrefresherpulling="bindrefresherpulling"
+		bindrefresherrefresh="bindrefresherrefresh" 
+		bindrefresherrestore="bindrefresherrestore"
+		>
 			<view class="cu-card dynamic no-card solid-bottom" wx:for="{{hotDynamicList}}" wx:key='key' bindtap="bindNavDynamicDetail" data-dynamic-id="{{item.dynamicId}}">
 				<view class="cu-item shadow">
 					<!-- 头像、昵称、时间区 -->
@@ -68,10 +74,10 @@
 				</view>
 				<!-- 分享,点赞,评论 -->
 				<view class="text-black flex aligin-center justify-between" style="font-size: 46rpx;padding:22rpx 30rpx 22rpx 146rpx">
-					<view class="flex align-center" catchtap="catchShare" data-song-id="{{item.song.id}}">
+					<button class="flex align-center my-button" open-type="share" catchtap="catchShare" data-idx="{{index}}" data-song-id="{{item.song.id}}">
 						<text class="cuIcon-share margin-lr-xs" />
 							<text style="font-size:30rpx">分享</text>
-					</view>
+					</button>
 					<view class="flex align-center" catchtap="catchComments" data-dynamic-id="{{item.dynamicId}}">
 						<text class="cuIcon-message margin-lr-xs" />
 						<text style="font-size:30rpx">{{item.commentsNum}}</text>

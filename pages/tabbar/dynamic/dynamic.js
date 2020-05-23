@@ -19,7 +19,9 @@ Page({
         placeholder: '唱的真好，夸夸TA~',
         inputFocus: false,
         inputValue: "",
-        curDynamic: []
+        curDynamic: [],
+        // 动态刷新标志
+        trigger: false
     },
 
     onLoad: function(options) {
@@ -33,7 +35,31 @@ Page({
      * 生命周期函数--监听页面显示
      */
     onShow: function() {
-
+        this.getDynamic();
+    },
+    onPullDownRefresh: function() {
+        // 触发下拉刷新时执行
+        console.log("触发下拉刷新");
+        this.getDynamic();
+        wx.stopPullDownRefresh()
+    },
+    bindrefresherpulling: function() {
+        this.setData({
+            trigger: true
+        })
+    },
+    bindrefresherrefresh: function() {
+        console.log("bindrefresher触发下拉刷新");
+        this.getDynamic();
+        var that = this;
+        setTimeout(function() {
+            that.setData({
+                trigger: false
+            })
+        }, 1000)
+    },
+    bindrefresherrestore: function() {
+        console.log("bindrefresherrestore,结束");
     },
     /** 自定义顶部栏函数 */
     //点击上部文字切换页面
@@ -94,8 +120,26 @@ Page({
         console.log('catchShare:' + e.currentTarget.dataset.songId);
         console.log(e);
     },
+    onShareAppMessage: function(res) {
+        console.log("onShareAppMessage", res.target.dataset.idx);
+        var idx = res.target.dataset.idx;
+        var dynamic = this.data.hotDynamicList[idx];
+        var img = dynamic.song.cover;
+        if (dynamic.images.length > 0) {
+            img = dynamic.images[0]
+        }
+        var titleString = `快来欣赏${dynamic.senderNickName}演唱的《${dynamic.song.name}》！`;
+        return {
+            title: titleString,
+            path: "/pages/detail/dynamicDetail/dynamicDetail?dynamicId=" + dynamic.dynamicId,
+            imageUrl: img
+        }
+    },
+
+
     // 点赞
     catchUp: function(e) {
+        // TODO:点赞还未完成
         // dynamicId
         console.log('catchUp:' + e.currentTarget.dataset.dynamicId);
         console.log(e);
@@ -163,6 +207,8 @@ Page({
             // for(let i=0;i<keysSorted.length;i++){
             //     sortedData[keysSorted[i]]=dynamicList[keysSorted[i]];
             // }
+
+            // 按时间排序
             var dynamicList = Object.values(dynamicListObj).sort((a, b) => {
                 return b.creatTime - a.creatTime;
             })
@@ -172,6 +218,8 @@ Page({
                 })
                 // 对象给动态展示页面用
             wx.setStorageSync('dynamicListObj', dynamicListObj);
+            console.log("动态数据已更新,共" + dynamicList.length + "条。");
+
         }).catch(err => {
             console.log('获取用户动态失败', err)
         })

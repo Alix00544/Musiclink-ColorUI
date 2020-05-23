@@ -36,6 +36,7 @@ Page({
      */
     onLoad: function(options) {
         console.log('onLoad', options);
+        console.log(app.globalData)
 
         var selectList = [],
             selectObj = {},
@@ -56,7 +57,8 @@ Page({
             selectObj: selectObj,
             lyrics: lyrics,
             savedSourceFilePath: savedSourceFilePath,
-            savedOffvocalFilePath: savedOffvocalFilePath
+            savedOffvocalFilePath: savedOffvocalFilePath,
+            userAvatar:app.globalData.userInfo.avatarUrl
         })
         offvocalAudio = wx.createInnerAudioContext();
         sourceAudio = wx.createInnerAudioContext();

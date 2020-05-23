@@ -22,7 +22,6 @@ function parsingRanklist(res){
   return ranklist;
 }
 
-
 module.exports ={
   parsingRanklist:parsingRanklist
 }

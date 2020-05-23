@@ -11,7 +11,7 @@
 			<text class="text-black">昵称</text>
 		</view>
 		<view class="action">
-			<text class="text-black text-xl">Alix1997</text>
+			<text class="text-black text-xl">{{userInfo.nickName}}</text>
 		</view>
 	</view>
 
@@ -21,7 +21,7 @@
 			<text class="text-black">头像</text>
 		</view>
 		<view class="action">
-			<view class="cu-avatar round lg" style="background-image:url(https://ossweb-img.qq.com/images/lol/web201310/skin/big10001.jpg);"></view>
+			<view class="cu-avatar round lg" style="background-image:url({{userInfo.avatarUrl}});"></view>
 		</view>
 	</view>
 	<view class="cu-item arrow">
@@ -37,7 +37,7 @@
 			<text class="text-black">性别</text>
 		</view>
 		<view class="action">
-			<switch class="switch-sex sm" bindchange="switchSex"></switch>
+			<switch class="switch-sex sm" bindchange="switchSex" aria-checked="{{userInfo.gender==1}}"></switch>
 		</view>
 	</view>
 

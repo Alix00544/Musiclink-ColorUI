@@ -83,7 +83,6 @@ function getShowTime(recordTime) {
 //   console.log("请求失败");
 // })
 const requestFromServer = (servelet, data, method = "GET") => {
-
     return new Promise((Resolve, Reject) => {
         wx.request({
             url: app.globalData.serveBase + "/" + servelet,
