@@ -1,6 +1,6 @@
 <cu-custom bgColor="bg-black" isBack="{{true}}">
 	<view slot="content">
-		<text class="text-bold">告白气球</text>
+		<text class="text-bold">{{song}}</text>
 	</view>
 </cu-custom>
 
@@ -13,6 +13,6 @@
 <view style="padding-top:120rpx"></view>
 
 <view class="cu-bar btn-group padding" style="margin-top:15rpx;">
-	<button class="cu-btn bg-red shadow-blur round lg" bindtap="bindSendDynamic">发布</button>
 	<button class="cu-btn bg-red shadow-blur round lg" bindtap="bindSingAgain">重唱</button>
+	<button class="cu-btn bg-red shadow-blur round lg" bindtap="bindSendDynamic">发布</button>
 </view>

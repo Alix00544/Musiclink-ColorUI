@@ -1,7 +1,7 @@
 const app = getApp();
 const util = require('../../../utils/util');
-var offvocalAudio = null,
-    sourceAudio = null;
+const offvocalAudio = wx.createInnerAudioContext();
+const sourceAudio = wx.createInnerAudioContext();
 const recorderManager = wx.getRecorderManager();
 const SoloMode = 0; // 独唱
 const ChorusMode = 1; // 合唱
@@ -48,10 +48,9 @@ Page({
                 selectObj[selectList[key]] = true;
             }
         }
-        offvocalAudio = wx.createInnerAudioContext();
-        sourceAudio = wx.createInnerAudioContext();
-        this.initAudio();
+
         // 初始化音频源地址、原伴奏音量
+        this.initAudio();
         offvocalAudio.src = savedOffvocalFilePath;
         sourceAudio.src = savedSourceFilePath;
 
@@ -62,15 +61,13 @@ Page({
             selectList: selectList,
             selectObj: selectObj,
             lyrics: lyrics,
-            savedSourceFilePath: savedSourceFilePath,
-            savedOffvocalFilePath: savedOffvocalFilePath,
             userAvatar: app.globalData.userInfo.avatarUrl
         })
     },
 
     onShow: function() {
+        console.log('唱歌页面onShow');
         var that = this;
-        console.log('唱歌页面onShow')
         this.initData();
         offvocalAudio.volume = 1;
         sourceAudio.volume = 0;
@@ -101,13 +98,17 @@ Page({
         recorderManager.stop();
     },
     onUnload: function() {
-        console.log('唱歌页面onUnload')
+        console.log('唱歌页面onUnload');
+        // 此处音频不能使用stop,会出意想不到的问题
         offvocalAudio.pause();
         sourceAudio.pause();
         offvocalAudio.seek(0);
         sourceAudio.seek(0);
         recorderManager.stop();
         this.offListener();
+        // 不要destory,会使音频TimeUpdate失效....无法显示播放进度
+        // offvocalAudio.destroy();
+        // sourceAudio.destroy();
     },
     initData: function() {
         this.setData({
@@ -133,7 +134,6 @@ Page({
         offvocalAudio.offEnded();
         offvocalAudio.offTimeUpdate();
         sourceAudio.offEnded();
-
     },
     initRecorderManager: function() {
         recorderManager.onStop((res) => {
@@ -338,7 +338,6 @@ Page({
         offvocalAudio.pause();
         sourceAudio.seek(0);
         offvocalAudio.seek(0);
-
         recorderManager.stop();
         // 先置为false，再置为true,点点点动画就能播放....不然有可能失效
         this.initData();
@@ -503,8 +502,8 @@ Page({
             content: '离开后当前演唱进度不会被保存',
             success(res) {
                 if (res.confirm) {
-                    offvocalAudio.stop();
-                    sourceAudio.stop();
+                    // offvocalAudio.stop();
+                    // sourceAudio.stop();
                     recorderManager.stop();
                     wx.switchTab({
                         url: '../../tabbar/sing/sing',
