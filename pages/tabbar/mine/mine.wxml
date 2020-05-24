@@ -13,10 +13,10 @@
 <!-- 用户头像+昵称+背景图片信息 -->
 <view class="cu-item">
 	<!-- 背景图片层 -->
-	<view class="bg-img" style="height:{{180 + StatusBar}}px;background-image:url({{bgImg}});filter:brightness(77%)"></view>
+	<view class="bg-img" style="height:{{180 + 50 + StatusBar}}px;background-image:url({{bgImg}});filter:brightness(77%)"></view>
 	<!-- 内容层 -->
-	<view style="width:100%;height:{{180 + StatusBar}}px;padding-top:{{StatusBar}}px;position:absolute;top:0;left:0">
-		<view class="cu-bar" style="height:90px;margin-top:40px;">
+	<view style="width:100%;height:{{180 + 50 + StatusBar}}px;padding-top:{{StatusBar}}px;position:absolute;top:0;left:0">
+		<view class="cu-bar" style="height:90px;margin-top:70px;">
 			<view class="action">
 				<view class="cu-avatar xl round margin-left {{hasUserInfo?'':'cuIcon-people my-avatar-lg'}}" style="{{hasUserInfo ? 'background-image:url('+userInfo.avatarUrl+')':''}}"></view>
 				<!--  -->
@@ -85,16 +85,16 @@
 	</view> -->
 
 	<!-- 动态，作品，合唱 -->
-	<scroll-view scroll-x class="bg-white nav my-border-bottom" style="height:90rpx;" id="selectView">
-		<view class="flex text-center">
-			<view class="cu-item flex-sub {{index==TabCur?'text-red text-bold cur':''}}" wx:for="{{selectList}}" wx:key='selectList' bindtap="tabSelect" data-id="{{index}}">
+	<scroll-view scroll-x class="bg-white nav" style="height:45px;font-size:40rpx">
+		<!-- <view class="flex text-center"> -->
+			<view class="cu-item flex-sub {{index==TabCur?'text-bold cur':''}}" wx:for="{{selectList}}" wx:key='selectList' bindtap="tabSelect" data-id="{{index}}">
 				{{item}}
 			</view>
-		</view>
+		<!-- </view> -->
 	</scroll-view>
 
 	<!--内容主体-->
-	<swiper current="{{TabCur}}" duration="200" bindchange="swiperChange" style='height:{{WinHeight-CustomBar - 90 * ScreenWidth/750}}px'>
+	<swiper current="{{TabCur}}" duration="200" bindchange="swiperChange" style='height:{{WinHeight-CustomBar - 45}}px'>
 
 		<!-- 动态 -->
 		<swiper-item class='bg-white'>

@@ -4,7 +4,8 @@ App({
         userInfo: null,
         serveBase: "https://musiclink.caoyu.online/v1",
         cloudCallBase: 'https://test-1301509754.file.myqcloud.com',
-        cloudUploadBase: 'https://test-1301509754.cos.ap-guangzhou.myqcloud.com'
+        cloudUploadBase: 'https://test-1301509754.cos.ap-guangzhou.myqcloud.com',
+        curPlayAudio: -1
     },
     onLaunch: function() {
         // 获取系统信息，为custom顶部栏做准备
@@ -45,5 +46,6 @@ App({
                 }
             }
         })
+        this.globalData.backgroundAudioManager = wx.getBackgroundAudioManager();
     }
 })

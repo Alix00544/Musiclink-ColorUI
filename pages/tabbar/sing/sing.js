@@ -1,5 +1,6 @@
 const app = getApp();
 const util = require("../../../utils/util");
+const backgroundAudioManager = app.globalData.backgroundAudioManager;
 
 Page({
     data: {
@@ -39,7 +40,10 @@ Page({
         CustomBar: app.globalData.CustomBar,
         WinHeight: app.globalData.WinHeight,
         ScreenWidth: app.globalData.ScreenWidth,
-        scrollViewScorll: false
+        scrollViewScorll: false,
+        // 当前正在播放的歌曲
+        playingSongName: null,
+        bgPlay: false
     },
     onLoad: function(options) {
         var that = this;
@@ -48,9 +52,19 @@ Page({
                 scrollViewEnableHeight: rect.top - that.data.CustomBar - 100 * that.data.ScreenWidth / 750
             })
         }).exec();
+        backgroundAudioManager.onStop(() => {
+            console.log("sing backgroundAudioManager stop");
+            this.setData({
+                playingSongName: -1
+            });
+            this.globalData.curPlayAudio = -1;
+        });
     },
     onShow: function() {
-        this.getRankList()
+        this.getRankList();
+        this.setData({
+            playingSongName: app.globalData.curPlayAudio
+        })
     },
     getRankList: function() {
         util.requestFromServer('list', {}, 'GET').then((res) => {
@@ -98,13 +112,37 @@ Page({
                 }
             });
         }
-
-
     },
     bindNavSong: function(e) {
         wx.navigateTo({
             url: '../../detail/song/song?song=' + e.currentTarget.dataset.song,
         })
+    },
+    catchPlayAudio: function(e) {
+        console.log('catchPlayAudio:' + e.currentTarget.dataset.songName);
+        var playingSongName = this.data.playingSongName;
+        var curSongName = e.currentTarget.dataset.songName;
+        var bgPlay;
+        if (playingSongName == curSongName) {
+            if (backgroundAudioManager.paused) {
+                backgroundAudioManager.play();
+                bgPlay = true;
+            } else {
+                backgroundAudioManager.pause();
+                bgPlay = false;
+            }
+        } else {
+            // 播放新歌 或 切歌
+            backgroundAudioManager.title = curSongName;
+            // 设置了 src 之后会自动播放
+            backgroundAudioManager.src = `https://test-1301509754.file.myqcloud.com/songs/${curSongName}/source.mp3`;
+            bgPlay = true;
+        }
+        this.setData({
+            playingSongName: curSongName,
+            bgPlay: bgPlay
+        });
+        app.globalData.curPlayAudio = curSongName;
     },
     // 原来实现的吸顶方法，废弃，太卡顿了
     // bindscroll: function (e) {

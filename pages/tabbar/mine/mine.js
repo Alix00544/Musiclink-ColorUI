@@ -24,27 +24,17 @@ Page({
         upNums: 0,
         mySongs: [],
         dynamicList: [],
-        scrollViewEnableHeight: 180 + app.globalData.StatusBar - app.globalData.CustomBar
+        scrollViewEnableHeight: 180 + 50 + app.globalData.StatusBar - app.globalData.CustomBar
     },
 
     onLoad: function(options) {
         var that = this;
-        // 选择栏定位
-        // wx.createSelectorQuery().select('#selectView').boundingClientRect(function(rect) {
-        //     that.setData({
-        //         userInfo: app.globalData.userInfo,
-        //         hasUserInfo: Boolean(app.globalData.userInfo),
-        //         scrollViewEnableHeight: rect.top - that.data.CustomBar
-        //     })
-        // }).exec();
         if (wx.getStorageSync('openid')) {
             that.setData({
                 userInfo: app.globalData.userInfo,
                 hasUserInfo: Boolean(app.globalData.userInfo)
             })
         }
-
-
     },
     onShow: function() {
         var openid = wx.getStorageSync('openid');
@@ -57,7 +47,7 @@ Page({
         // 实现吸顶效果
         var scrollTop = e.scrollTop;
         var scrollViewScorll = this.data.scrollViewScorll;
-        if (e.scrollTop < this.data.scrollViewEnableHeight - 1) {
+        if (e.scrollTop < this.data.scrollViewEnableHeight) {
             // 减1是因为，定位值有偏差，但不大
             if (scrollViewScorll) {
                 this.setData({

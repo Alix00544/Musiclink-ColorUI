@@ -1,26 +1,37 @@
-page{
-  background-color: white;
+page {
+    background-color: white;
 }
+
 .my-swiper {
-  height: 125px;
-  min-height: 250rpx;
+    height: 125px;
+    min-height: 250rpx;
 }
 
 .nav .cu-item.cur {
-  border-bottom: 10rpx solid;
+    border-bottom: 10rpx solid;
 }
 
 .my-search-fixed {
-  position: fixed;
-  width: 100%;
-  z-index: 10;
+    position: fixed;
+    width: 100%;
+    z-index: 10;
 }
 
-.my-border-bottom{
-  border-bottom: 1px solid #f1f1f1;
+.my-border-bottom {
+    border-bottom: 1px solid #f1f1f1;
 }
 
-.my-box{
-  height: 150rpx;
-  width: 150rpx;
+.my-box {
+    height: 150rpx;
+    width: 150rpx;
+}
+
+.cu-tag.badge-left {
+    position: absolute;
+    top: 0;
+    left: 0;
+    font-size: 20rpx;
+    padding: 0rpx 10rpx;
+    height: 28rpx;
+    color: var(--white);
 }

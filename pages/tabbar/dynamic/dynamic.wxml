@@ -51,7 +51,7 @@
 					<view class="cu-list menu-avatar" style="padding-left: 146rpx;padding-right: 30rpx;">
 						<view class="cu-item" style="background-color: #f8f8f8;border-radius: 10px;padding: 0;margin-top: 20rpx;height:150rpx">
 							<view class="cu-avatar radius lg text-bold" style="background-image:url({{item.song.cover}});width:150rpx;height:150rpx;font-size: 3em;left:0;" catchtap="catchPlayAudio" data-song-id="{{item.song.id}}">
-								<text class="cuIcon-{{playingSongId== item.song.id ? 'stop':'playfill'}}" style="opacity:0.5;" />
+								<text class="cuIcon-{{playingSongId== item.song.id ? 'stop':'playfill'}}" style="opacity:0.9;" />
 							</view>
 							<view class="content with{{item.song.needChorus?'':'out'}}-chorus" style="left:170rpx;line-height:2em;">
 									<view class="text-lg text-black text-bold">

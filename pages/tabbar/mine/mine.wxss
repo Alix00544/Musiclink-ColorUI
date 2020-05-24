@@ -1,36 +1,46 @@
 .cu-avatar.xl {
-  width: 160rpx;
-  height: 160rpx;
-  font-size: 2.5em;
+    width: 160rpx;
+    height: 160rpx;
+    font-size: 2.5em;
 }
 
 .my-flex-column {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
 }
 
 .my-text-lg {
-  font-size: 45rpx;
-  font-weight: bold;
+    font-size: 45rpx;
+    font-weight: bold;
 }
 
 .content.my-nickname {
-  font-size: 60rpx;
-  margin-left: 240rpx;
-  text-align: left;
-  /* font-weight: bolder; */
-  color: white;
+    font-size: 60rpx;
+    margin-left: 240rpx;
+    text-align: left;
+    /* font-weight: bolder; */
+    color: white;
 }
 
-.my-avatar-lg{
-  font-size: 100rpx !important;
+.my-avatar-lg {
+    font-size: 100rpx !important;
 }
 
 .nav .cu-item.cur {
-  border-bottom: 10rpx solid;
+    border-bottom: 15rpx solid red;
+    font-size: 1.3em;
 }
-.my-border-bottom{
-  border-bottom: 1px solid #f1f1f1;
+
+.nav .cu-item {
+    height: 40px;
+    line-height: 48px;
+    margin: 0 15rpx;
+    padding-top: 2px;
+    padding-left: 0;
+}
+
+.my-border-bottom {
+    border-bottom: 1px solid #f1f1f1;
 }
