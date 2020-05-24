@@ -150,7 +150,7 @@ Page({
         this.setData({
             showComments: true,
             curDynamicId: e.currentTarget.dataset.dynamicId
-        })
+        });
     },
     // 隐藏底部评论弹出框
     bindHideComments: function(e) {

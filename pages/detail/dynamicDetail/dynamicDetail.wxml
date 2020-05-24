@@ -17,7 +17,7 @@
 <!-- 用户头像+昵称+背景图片信息 -->
 <view class="cu-item">
   <!-- 背景图片层 -->
-  <swiper class="screen-swiper square-dot" style="height:{{ScreenWidth}}px;" indicator-dots="true" circular="true" autoplay="true" interval="5000" duration="500">
+  <swiper class="screen-swiper square-dot" style="height:{{ScreenWidth}}px;" indicator-dots="true" circular="true" autoplay="true" interval="1500" duration="500">
     <swiper-item wx:for="{{swiperList}}" wx:key='key'>
       <image src="{{item}}" mode="aspectFill"></image>
     </swiper-item>

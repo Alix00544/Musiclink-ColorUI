@@ -2,10 +2,10 @@
 <view class="cu-custom">
 	<!-- 直接将opacity渐变加在整体上，会导致设置icon也跟着渐变，为了解决这个问题，将opacity设置在背景色rgba上 -->
 	<view class="cu-bar fixed" style="height:{{CustomBar}}px;padding-top:{{StatusBar}}px;background:rgba(255,255,255,{{navBarOpacity}})">
-		<view class="action  cuIcon-settings{{navBarOpacity>0.6? ' text-black':'fill text-white'}}" bindtap="bindSetting" style="font-size:1.7em;">
+		<view class="action  cuIcon-settingsfill {{navBarOpacity>0.6? 'text-black':'text-white'}}" bindtap="bindSetting" style="font-size:1.7em;">
 		</view>
 		<view class="content" style="top:{{StatusBar}}px">
-			<view class="text-cut text-black text-bold" wx:if="{{navBarOpacity > 0.6}}" style="opacity:{{navBarOpacity}}">{{userInfo.nickName}}</view>
+			<view class="text-cut text-black" wx:if="{{navBarOpacity > 0.6}}" style="opacity:{{navBarOpacity}}">{{userInfo.nickName}}</view>
 		</view>
 	</view>
 </view>
@@ -66,7 +66,7 @@
 </view>
 
 <!-- 播放历史，发布动态 -->
-<view class="box" wx:if="{{hasUserInfo}}">
+<view class="box bg-white" wx:if="{{hasUserInfo}}">
 	<!-- <view class="grid col-2 padding-lr-xl bg-white margin-bottom-sm">
 		<view class="padding-sm">
 			<view class="bg-white padding radius text-center shadow">
@@ -173,7 +173,7 @@
 			<scroll-view scroll-y="{{scrollViewScorll}}" style="height: 100%;">
 			<view class="cu-list menu-avatar">
 				<view class="cu-item" style="height:170rpx" wx:for="{{mySongs}}" wx:key="key" wx:for-item="song">
-					<view class="cu-avatar radius lg shadow-blur" style="background-image:url({{song.coverImg}});width:150rpx;height:150rpx;opacity:0.8;font-size: 3em;"></view>
+					<view class="cu-avatar radius lg shadow-blur" style="background-image:url('{{song.coverImg}}');width:150rpx;height:150rpx;opacity:0.8;font-size: 3em;"></view>
 					<view class="content" style="width:calc(100% - 150rpx - 60rpx - 200rpx - 20rpx);left:200rpx;line-height:2em;">
 						<view class="text-cut text-lg">{{song.song}}</view>
 						<view class="text-gray text-sm flex">

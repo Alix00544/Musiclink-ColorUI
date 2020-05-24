@@ -1,5 +1,5 @@
 <!-- 自定义顶部栏 -->
-<view class="cus-nav bg-gradual-red fixed">
+<view class="cus-nav bg-gradual-blue fixed">
 	<view style='padding-top:{{StatusBar}}px;height:{{CustomBar-StatusBar}}px;display:flex;width:750rpx;box-sizing:content-box'>
 		<view class="nav-search" bindtap="navToSearch">
 			<image class="my-img-lg" src="../../../images/icon/search.png" />
@@ -17,7 +17,7 @@
 <!-- 填补顶部栏的空间 -->
 <view style="padding-top:{{CustomBar}}px" />
 <!-- 内容主体 -->
-<swiper current="{{currentTab}}" style='height: {{WinHeight-CustomBar}}px' duration="200" bindchange="swiperChange">
+<swiper class="bg-white"  current="{{currentTab}}" style='height: {{WinHeight-CustomBar}}px' duration="200" bindchange="swiperChange">
 	<!-- 热门 -->
 	<swiper-item>
 		<scroll-view scroll-y style="height: 100%" class="bg-white" 
@@ -111,11 +111,11 @@
 </swiper>
 <!-- 底部评论弹窗 -->
 <view class="cu-modal bottom-modal {{showComments?'show':''}}" bindtap="bindHideComments">
-	<view class="cu-dialog bg-white" style="height:60%;" catchtap>
+	<view class="cu-dialog bg-white" style="height:50%;border-radius:15px" catchtap>
 
-		<view class="cu-bar bg-white solid-bottom">
-			<view class="action text-green">确定</view>
-			<view class="action text-blue" bindtap="bindHideComments">取消</view>
+		<view class="cu-bar bg-white text-bold" style="font-size:35rpx">
+			<view class="action" style="font-size:40rpx">评论</view>
+			<view class="action padding-lr-lg cuIcon-close" bindtap="bindHideComments"></view>
 		</view>
 		<scroll-view scroll-y style="height: 100%">
 			<view class="cu-list menu-avatar comment">

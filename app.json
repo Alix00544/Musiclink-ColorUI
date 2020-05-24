@@ -21,7 +21,7 @@
     "tabBar": {
         "color": "#7A7E83",
         "selectedColor": "#e54d42",
-        "borderStyle": "black",
+        "borderStyle": "white",
         "backgroundColor": "#ffffff",
         "list": [{
                 "pagePath": "pages/tabbar/dynamic/dynamic",
